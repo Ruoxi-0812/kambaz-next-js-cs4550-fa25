@@ -8,7 +8,7 @@ export default function Dashboard() {
       <div id="wd-dashboard-courses">
         <div className="wd-dashboard-course">
           <Link href="/Courses/4550" className="wd-dashboard-course-link">
-            <Image src="/images/reactjs.jpg" width={200} height={150} />
+            <Image src="/images/reactjs.jpg" width={200} height={150} alt = "cs4550"/>
             <div>
               <h5> CS4550 Web Development </h5>
               <p className="wd-dashboard-course-title">
@@ -20,7 +20,7 @@ export default function Dashboard() {
         </div>
         <div className="wd-dashboard-course">
           <Link href="/Courses/4400" className="wd-dashboard-course-link">
-            <Image src="/images/4400.jpg" width={200} height={150} />
+            <Image src="/images/4400.jpg" width={200} height={150} alt = "cs4400"/>
             <div>
               <h5> CS4400 Programming Languages </h5>
               <p className="wd-dashboard-course-title">
@@ -32,7 +32,7 @@ export default function Dashboard() {
         </div>
         <div className="wd-dashboard-course">
           <Link href="/Courses/4700" className="wd-dashboard-course-link">
-            <Image src="/images/4700.jpg" width={200} height={150} />
+            <Image src="/images/4700.jpg" width={200} height={150} alt = "cs4700"/>
             <div>
               <h5> CS4700 Network Fundamentals </h5>
               <p className="wd-dashboard-course-title">
@@ -44,7 +44,7 @@ export default function Dashboard() {
         </div>
         <div className="wd-dashboard-course">
           <Link href="/Courses/3650" className="wd-dashboard-course-link">
-            <Image src="/images/3650.jpg" width={200} height={150} />
+            <Image src="/images/3650.jpg" width={200} height={150} alt = "cs3650"/>
             <div>
               <h5> CS3650 Computer Systems </h5>
               <p className="wd-dashboard-course-title">
@@ -56,7 +56,7 @@ export default function Dashboard() {
         </div>
         <div className="wd-dashboard-course">
           <Link href="/Courses/2800" className="wd-dashboard-course-link">
-            <Image src="/images/2800.jpg" width={200} height={150} />
+            <Image src="/images/2800.jpg" width={200} height={150} alt = "cs2800"/>
             <div>
               <h5> CS2800 Logic and Computation </h5>
               <p className="wd-dashboard-course-title">
@@ -68,7 +68,7 @@ export default function Dashboard() {
         </div>
         <div className="wd-dashboard-course">
           <Link href="/Courses/1800" className="wd-dashboard-course-link">
-            <Image src="/images/1800.jpg" width={200} height={150} />
+            <Image src="/images/1800.jpg" width={200} height={150} alt = "cs1800"/>
             <div>
               <h5> CS1800 Discrete Structures </h5>
               <p className="wd-dashboard-course-title">
@@ -80,7 +80,7 @@ export default function Dashboard() {
         </div>
         <div className="wd-dashboard-course">
           <Link href="/Courses/1210" className="wd-dashboard-course-link">
-            <Image src="/images/1210.jpg" width={200} height={150} />
+            <Image src="/images/1210.jpg" width={200} height={150} alt = "cs1210"/>
             <div>
               <h5> CS1210 Professional Development </h5>
               <p className="wd-dashboard-course-title">
