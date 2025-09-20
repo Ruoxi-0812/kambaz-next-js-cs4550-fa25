@@ -13,7 +13,7 @@ export default function Assignments() {
       <ul id="wd-assignment-list">
         <li className="wd-assignment-list-item">
           <Link
-            href="/Courses/4550/Assignments/a1"
+            href="/Courses/1234/Assignments/123"
             className="wd-assignment-link"
           >
             A1 - ENV + HTML
@@ -26,7 +26,7 @@ export default function Assignments() {
 
         <li className="wd-assignment-list-item">
           <Link
-            href="/Courses/4550/Assignments/a2"
+            href="/Courses/1234/Assignments/123"
             className="wd-assignment-link"
           >
             A2 - CSS + BOOTSTRAP
@@ -39,7 +39,7 @@ export default function Assignments() {
 
         <li className="wd-assignment-list-item">
           <Link
-            href="/Courses/4550/Assignments/a3"
+            href="/Courses/1234/Assignments/123"
             className="wd-assignment-link"
           >
             A3 - JAVASCRIPT + REACT
@@ -57,7 +57,7 @@ export default function Assignments() {
       <ul id="wd-quiz-list">
         <li className="wd-assignment-list-item">
           <Link
-            href="/Courses/4550/Assignments/q1"
+            href="/Courses/1234/Assignments/q1"
             className="wd-assignment-link"
           >
             Q1 - HTML Basics
@@ -75,7 +75,7 @@ export default function Assignments() {
       <ul id="wd-exam-list">
         <li className="wd-assignment-list-item">
           <Link
-            href="/Courses/4550/Assignments/exam1"
+            href="/Courses/1234/Assignments/exam1"
             className="wd-assignment-link"
           >
             Exam
@@ -93,7 +93,7 @@ export default function Assignments() {
       <ul id="wd-project-list">
         <li className="wd-assignment-list-item">
           <Link
-            href="/Courses/4550/Assignments/final"
+            href="/Courses/1234/Assignments/final"
             className="wd-assignment-link"
           >
             Final Project
