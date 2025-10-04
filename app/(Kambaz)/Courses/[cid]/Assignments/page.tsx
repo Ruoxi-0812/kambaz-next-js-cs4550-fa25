@@ -1,109 +1,159 @@
+"use client";
+
+import {
+  ListGroup,
+  ListGroupItem,
+  Button,
+  Form,
+  InputGroup,
+} from "react-bootstrap";
+import { BsGripVertical, BsPlus, BsThreeDotsVertical } from "react-icons/bs";
+import { FaSearch } from "react-icons/fa";
 import Link from "next/link";
+import AssignmentControlButtons from "./AssignmentControlButtons";
+import { LiaBookSolid } from "react-icons/lia";
+
 export default function Assignments() {
   return (
-    <div id="wd-assignments">
-      <input id="wd-search-assignment" placeholder="Search for Assignments" />
-      <button id="wd-add-assignment-group">+ Group</button>
-      <button id="wd-add-assignment">+ Assignment</button>
+    <div id="wd-assignments" className="p-3">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <div style={{ maxWidth: 340 }} className="w-100">
+          <InputGroup>
+            <InputGroup.Text className="bg-white">
+              <FaSearch className="text-secondary" />
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Search..."
+              id="wd-search-assignments"
+            />
+          </InputGroup>
+        </div>
+        <div className="ms-3 flex-shrink-0">
+          <Button variant="secondary" className="me-2" id="wd-add-group">
+            + Group
+          </Button>
+          <Button variant="danger" id="wd-add-assignment">
+            + Assignment
+          </Button>
+        </div>
+      </div>
 
-      <h3 id="wd-assignments-title">
-        ASSIGNMENTS 40% of Total <button>+</button>
-      </h3>
-
-      <ul id="wd-assignment-list">
-        <li className="wd-assignment-list-item">
-          <Link
-            href="/Courses/1234/Assignments/123"
-            className="wd-assignment-link"
-          >
-            A1 - ENV + HTML
-          </Link>
-          <div>
-            Multiple Modules | <b>Not available until</b> May 6 at 12:00am |{" "}
-            <b>Due</b> May 13 at 11:59pm | 100 pts
+      <ListGroup className="rounded-0">
+        <ListGroupItem className="wd-module p-0 mb-4 fs-5 border-gray">
+          <div className="wd-title px-3 py-2 bg-secondary-subtle d-flex justify-content-between align-items-center border-bottom">
+            <span className="d-flex align-items-center">
+              <BsGripVertical className="me-2 fs-5 text-muted" />
+              <span className="fw-semibold text-uppercase">ASSIGNMENTS</span>
+            </span>
+            <div className="d-flex align-items-center">
+              <span className="badge rounded-pill text-bg-light border me-2">
+                40% of Total
+              </span>
+              <BsPlus className="fs-4 me-2 text-secondary" />
+              <BsThreeDotsVertical className="fs-5 text-secondary" />
+            </div>
           </div>
-        </li>
 
-        <li className="wd-assignment-list-item">
-          <Link
-            href="/Courses/1234/Assignments/123"
-            className="wd-assignment-link"
-          >
-            A2 - CSS + BOOTSTRAP
-          </Link>
-          <div>
-            Multiple Modules | <b>Not available until</b> May 13 at 12:00am |{" "}
-            <b>Due</b> May 20 at 11:59pm | 100 pts
-          </div>
-        </li>
+          <ListGroup className="wd-lessons rounded-0">
+            {/* A1 */}
+            <ListGroupItem
+              className="wd-lesson py-3 ps-0 pe-3 d-flex align-items-start justify-content-between border-0 border-bottom"
+              style={{ borderLeft: "6px solid #198754" }}
+            >
+              <div className="d-flex align-items-start w-100">
+                <div className="px-3 pt-1">
+                  <BsGripVertical className="me-2 fs-5 text-muted" />
+                  <LiaBookSolid className="me-2 fs-4 text-success" />
+                </div>
+                <div className="flex-grow-1">
+                  <Link
+                    href="/Courses/1234/Assignments/a1"
+                    className="fw-semibold text-dark text-decoration-none fs-5"
+                  >
+                    A1
+                  </Link>
+                  <div className="text-muted small mt-1">
+                    <span className="text-danger">Multiple Modules</span>
+                    <span className="mx-2 text-muted">|</span>
+                    <b>Not available until</b> May 6 at 12:00am |
+                  </div>
+                  <div className="text-muted small">
+                    <b>Due</b> May 13 at 11:59pm
+                    <span className="mx-2 text-muted">|</span>
+                    100 pts
+                  </div>
+                </div>
+              </div>
+              <AssignmentControlButtons />
+            </ListGroupItem>
 
-        <li className="wd-assignment-list-item">
-          <Link
-            href="/Courses/1234/Assignments/123"
-            className="wd-assignment-link"
-          >
-            A3 - JAVASCRIPT + REACT
-          </Link>
-          <div>
-            Multiple Modules | <b>Not available until</b> May 20 at 12:00am |{" "}
-            <b>Due</b> May 27 at 11:59pm | 100 pts
-          </div>
-        </li>
-      </ul>
+            {/* A2 */}
+            <ListGroupItem
+              className="wd-lesson py-3 ps-0 pe-3 d-flex align-items-start justify-content-between border-0 border-bottom"
+              style={{ borderLeft: "6px solid #198754" }}
+            >
+              <div className="d-flex align-items-start w-100">
+                <div className="px-3 pt-1">
+                  <BsGripVertical className="me-2 fs-5 text-muted" />
+                  <LiaBookSolid className="me-2 fs-4 text-success" />
+                </div>
+                <div className="flex-grow-1">
+                  <Link
+                    href="/Courses/1234/Assignments/a2"
+                    className="fw-semibold text-dark text-decoration-none fs-5"
+                  >
+                    A2
+                  </Link>
+                  <div className="text-muted small mt-1">
+                    <span className="text-danger">Multiple Modules</span>
+                    <span className="mx-2 text-muted">|</span>
+                    <b>Not available until</b> May 13 at 12:00am |
+                  </div>
+                  <div className="text-muted small">
+                    <b>Due</b> May 20 at 11:59pm
+                    <span className="mx-2 text-muted">|</span>
+                    100 pts
+                  </div>
+                </div>
+              </div>
+              <AssignmentControlButtons />
+            </ListGroupItem>
 
-      <h3 id="wd-quizzes-title">
-        QUIZZES 10% of Total <button>+</button>
-      </h3>
-      <ul id="wd-quiz-list">
-        <li className="wd-assignment-list-item">
-          <Link
-            href="/Courses/1234/Assignments/q1"
-            className="wd-assignment-link"
-          >
-            Q1 - HTML Basics
-          </Link>
-          <div>
-            <b>Not available until</b> May 14 at 12:00am | <b>Due</b> May 15 at
-            11:59pm | 20 pts
-          </div>
-        </li>
-      </ul>
-
-      <h3 id="wd-exams-title">
-        EXAMS 30% of Total <button>+</button>
-      </h3>
-      <ul id="wd-exam-list">
-        <li className="wd-assignment-list-item">
-          <Link
-            href="/Courses/1234/Assignments/exam1"
-            className="wd-assignment-link"
-          >
-            Exam
-          </Link>
-          <div>
-            <b>Not available until</b> May 29 at 12:00am | <b>Due</b> May 30 at
-            11:59pm | 100 pts
-          </div>
-        </li>
-      </ul>
-
-      <h3 id="wd-project-title">
-        PROJECT 20% of Total <button>+</button>
-      </h3>
-      <ul id="wd-project-list">
-        <li className="wd-assignment-list-item">
-          <Link
-            href="/Courses/1234/Assignments/final"
-            className="wd-assignment-link"
-          >
-            Final Project
-          </Link>
-          <div>
-            Group project | <b>Not available until</b> May 10 at 12:00am |{" "}
-            <b>Due</b> Jun 10 at 11:59pm | 200 pts
-          </div>
-        </li>
-      </ul>
+            {/* A3 */}
+            <ListGroupItem
+              className="wd-lesson py-3 ps-0 pe-3 d-flex align-items-start justify-content-between border-0"
+              style={{ borderLeft: "6px solid #198754" }}
+            >
+              <div className="d-flex align-items-start w-100">
+                <div className="px-3 pt-1">
+                  <BsGripVertical className="me-2 fs-5 text-muted" />
+                  <LiaBookSolid className="me-2 fs-4 text-success" />
+                </div>
+                <div className="flex-grow-1">
+                  <Link
+                    href="/Courses/1234/Assignments/a3"
+                    className="fw-semibold text-dark text-decoration-none fs-5"
+                  >
+                    A3
+                  </Link>
+                  <div className="text-muted small mt-1">
+                    <span className="text-danger">Multiple Modules</span>
+                    <span className="mx-2 text-muted">|</span>
+                    <b>Not available until</b> May 20 at 12:00am |
+                  </div>
+                  <div className="text-muted small">
+                    <b>Due</b> May 27 at 11:59pm
+                    <span className="mx-2 text-muted">|</span>
+                    100 pts
+                  </div>
+                </div>
+              </div>
+              <AssignmentControlButtons />
+            </ListGroupItem>
+          </ListGroup>
+        </ListGroupItem>
+      </ListGroup>
     </div>
   );
 }
