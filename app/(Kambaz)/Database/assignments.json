@@ -1,0 +1,116 @@
+[
+    {
+      "_id": "a1",
+      "course": "4550",
+      "title": "A1",
+      "description": "The assignment is available online.\n\nSubmit a link to the landing page of your Web application running on Netlify.\n\nThe landing page should include the following:\n• Your full name and section\n• Links to each of the lab assignments\n• Link to the Kanbas application\n• Links to all relevant source code repositories\n\nThe Kanbas application should include a link to navigate back to the landing page.",
+      "points": 100,
+      "available": "May 6 at 12:00am",
+      "availableISO": "2025-05-06",
+      "due": "May 13 at 11:59pm",
+      "dueISO": "2025-05-13"
+    },
+    {
+      "_id": "a2",
+      "course": "4550",
+      "title": "A2",
+      "description": "Assignment 2 description",
+      "points": 100,
+      "available": "May 13 at 12:00am",
+      "availableISO": "2025-05-13",
+      "due": "May 20 at 11:59pm",
+      "dueISO": "2025-05-20"
+    },
+    {
+      "_id": "a3",
+      "course": "4550",
+      "title": "A3",
+      "description": "Assignment 3 description",
+      "points": 100,
+      "available": "May 20 at 12:00am",
+      "availableISO": "2025-05-20",
+      "due": "May 27 at 11:59pm",
+      "dueISO": "2025-05-27"
+    },
+  
+    {
+      "_id": "hw1",
+      "course": "4400",
+      "title": "HW1",
+      "description": "Homework 1 description",
+      "points": 100,
+      "available": "Sep 2 at 12:00am",
+      "availableISO": "2025-09-02",
+      "due": "Sep 9 at 11:59pm",
+      "dueISO": "2025-09-09"
+    },
+    {
+      "_id": "hw2",
+      "course": "4400",
+      "title": "HW2",
+      "description": "Homework 2 description",
+      "points": 100,
+      "available": "Sep 9 at 12:00am",
+      "availableISO": "2025-09-09",
+      "due": "Sep 16 at 11:59pm",
+      "dueISO": "2025-09-16"
+    },
+  
+    {
+      "_id": "proj",
+      "course": "4700",
+      "title": "Project",
+      "description": "Course project description",
+      "points": 200,
+      "available": "Oct 1 at 12:00am",
+      "availableISO": "2025-10-01",
+      "due": "Oct 31 at 11:59pm",
+      "dueISO": "2025-10-31"
+    },
+  
+    {
+      "_id": "3650-a1",
+      "course": "3650",
+      "title": "A1",
+      "description": "Answer questions about processes, threads, and memory hierarchy. Include short explanations and a diagram.",
+      "points": 100,
+      "available": "Sep 1 at 12:00am",
+      "availableISO": "2025-09-01",
+      "due": "Sep 8 at 11:59pm",
+      "dueISO": "2025-09-08"
+    },
+    {
+      "_id": "2800-a1",
+      "course": "2800",
+      "title": "A1",
+      "description": "Build truth tables for given propositions and determine equivalences.",
+      "points": 100,
+      "available": "Feb 5 at 12:00am",
+      "availableISO": "2025-02-05",
+      "due": "Feb 12 at 11:59pm",
+      "dueISO": "2025-02-12"
+    },
+    {
+      "_id": "1800-a1",
+      "course": "1800",
+      "title": "A1",
+      "description": "Exercises on set operations and function properties (injective/surjective/bijective).",
+      "points": 100,
+      "available": "Sep 1 at 12:00am",
+      "availableISO": "2025-09-01",
+      "due": "Sep 8 at 11:59pm",
+      "dueISO": "2025-09-08"
+    },
+    {
+      "_id": "1210-a1",
+      "course": "1210",
+      "title": "A1",
+      "description": "Submit a one-page career plan including short-term and long-term goals and target roles.",
+      "points": 100,
+      "available": "Sep 1 at 12:00am",
+      "availableISO": "2025-09-01",
+      "due": "Sep 8 at 11:59pm",
+      "dueISO": "2025-09-08"
+    }
+  ]
+  

@@ -1,56 +1,63 @@
 "use client";
 
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import * as db from "../../../../Database";
+
 import Form from "react-bootstrap/Form";
 import FormGroup from "react-bootstrap/FormGroup";
 import FormLabel from "react-bootstrap/FormLabel";
 import FormControl from "react-bootstrap/FormControl";
 import FormCheck from "react-bootstrap/FormCheck";
 import FormSelect from "react-bootstrap/FormSelect";
-import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
-import CardBody from "react-bootstrap/CardBody";
+
+type Assignment = {
+  _id: string;
+  course: string;
+  title: string;
+  description: string;
+  points: number;
+  due?: string;
+  available?: string;
+  until?: string;
+  dueISO?: string;
+  availableISO?: string;
+  untilISO?: string;
+};
 
 export default function AssignmentEditor() {
+  const { cid, aid } = useParams<{ cid: string; aid: string }>();
+  const a = (db.assignments as Assignment[]).find(
+    (x) => x.course === String(cid) && x._id === String(aid)
+  );
+
+  if (!a) return null;
+
   return (
     <div id="wd-assignments-editor" className="p-3">
       <Form>
         <FormGroup className="mb-3" controlId="wd-name">
           <FormLabel>Assignment Name</FormLabel>
-          <FormControl type="text" defaultValue="A1" />
+          <FormControl type="text" defaultValue={a.title} />
         </FormGroup>
 
         <FormGroup className="mb-3" controlId="wd-description">
-  <FormLabel>Description</FormLabel>
-  <div className="border p-3 rounded bg-white">
-    The assignment is <span className="text-danger">available online</span><br />
-    Submit a link to the landing page of your Web application running on Netlify.<br />
-    The landing page should include the following:
-    <ul>
-      <li>Your full name and section</li>
-      <li>Links to each of the lab assignments</li>
-      <li>Link to the Kanbas application</li>
-      <li>Links to all relevant source code repositories</li>
-    </ul>
-    The Kanbas application should include a link to navigate back to the landing page.
-  </div>
-</FormGroup>
-
+          <FormLabel>Description</FormLabel>
+          <FormControl as="textarea" rows={10} defaultValue={a.description} />
+        </FormGroup>
 
         <FormGroup as={Row} className="mb-3" controlId="wd-points">
-          <FormLabel column sm={2}>
-            Points
-          </FormLabel>
+          <FormLabel column sm={2}>Points</FormLabel>
           <Col sm={4}>
-            <FormControl type="number" defaultValue={100} />
+            <FormControl type="number" defaultValue={a.points ?? 100} />
           </Col>
         </FormGroup>
 
         <FormGroup as={Row} className="mb-3" controlId="wd-group">
-          <FormLabel column sm={2}>
-            Assignment Group
-          </FormLabel>
+          <FormLabel column sm={2}>Assignment Group</FormLabel>
           <Col sm={4}>
             <FormSelect defaultValue="ASSIGNMENTS">
               <option value="ASSIGNMENTS">ASSIGNMENTS</option>
@@ -62,9 +69,7 @@ export default function AssignmentEditor() {
         </FormGroup>
 
         <FormGroup as={Row} className="mb-3" controlId="wd-display-grade-as">
-          <FormLabel column sm={2}>
-            Display Grade as
-          </FormLabel>
+          <FormLabel column sm={2}>Display Grade as</FormLabel>
           <Col sm={4}>
             <FormSelect defaultValue="Percentage">
               <option value="Percentage">Percentage</option>
@@ -76,7 +81,7 @@ export default function AssignmentEditor() {
         </FormGroup>
 
         <Card className="mb-3">
-          <CardBody>
+          <Card.Body>
             <FormGroup className="mb-3" controlId="wd-submission-type">
               <FormLabel>Submission Type</FormLabel>
               <FormSelect defaultValue="Online">
@@ -96,11 +101,11 @@ export default function AssignmentEditor() {
                 <FormCheck type="checkbox" label="File Uploads" />
               </div>
             </FormGroup>
-          </CardBody>
+          </Card.Body>
         </Card>
 
         <Card className="mb-3">
-          <CardBody>
+          <Card.Body>
             <FormGroup className="mb-3">
               <FormLabel>Assign to</FormLabel>
               <FormControl type="text" defaultValue="Everyone" />
@@ -110,7 +115,7 @@ export default function AssignmentEditor() {
               <Col sm={4}>
                 <FormGroup controlId="wd-due-date">
                   <FormLabel>Due</FormLabel>
-                  <FormControl type="date" defaultValue="2024-05-13" />
+                  <FormControl type="date" defaultValue={a.dueISO ? a.dueISO : ""} />
                 </FormGroup>
               </Col>
             </Row>
@@ -119,25 +124,27 @@ export default function AssignmentEditor() {
               <Col sm={4}>
                 <FormGroup controlId="wd-available-from">
                   <FormLabel>Available from</FormLabel>
-                  <FormControl type="date" defaultValue="2024-05-06" />
+                  <FormControl type="date" defaultValue={a.availableISO ? a.availableISO : ""} />
                 </FormGroup>
               </Col>
               <Col sm={4}>
                 <FormGroup controlId="wd-available-until">
                   <FormLabel>Until</FormLabel>
-                  <FormControl type="date" defaultValue="2024-05-20" />
+                  <FormControl type="date" defaultValue={a.untilISO ? a.untilISO : ""} />
                 </FormGroup>
               </Col>
             </Row>
-          </CardBody>
+          </Card.Body>
         </Card>
 
         <div className="mt-4 d-flex justify-content-end">
-  <Button variant="secondary" className="me-2">
-    Cancel
-  </Button>
-  <Button variant="danger">Save</Button>
-</div>
+          <Link href={`/Courses/${cid}/Assignments`} className="btn btn-secondary me-2">
+            Cancel
+          </Link>
+          <Link href={`/Courses/${cid}/Assignments`} className="btn btn-danger">
+            Save
+          </Link>
+        </div>
       </Form>
     </div>
   );

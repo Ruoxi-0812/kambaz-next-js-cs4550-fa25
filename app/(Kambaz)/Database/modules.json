@@ -1,0 +1,117 @@
+[
+    {
+      "_id": "4550-m1",
+      "course": "4550",
+      "name": "Week 1 — Intro to Web Dev",
+      "lessons": [
+        { "name": "Course Introduction, Syllabus, Agenda" },
+        { "name": "What is Web Development" },
+        { "name": "Slides: Intro to React" }
+      ]
+    },
+    {
+      "_id": "4550-m2",
+      "course": "4550",
+      "name": "Week 2 — HTML & DOM",
+      "lessons": [
+        { "name": "Formatting with HTML" },
+        { "name": "Lists and Tables" }
+      ]
+    },
+    {
+      "_id": "4550-m3",
+      "course": "4550",
+      "name": "Week 3 — CSS Basics",
+      "lessons": [
+        { "name": "Selectors and Specificity" }
+      ]
+    },
+  
+    {
+      "_id": "4400-m1",
+      "course": "4400",
+      "name": "Week 1 — Syntax",
+      "lessons": [
+        { "name": "Grammars" },
+        { "name": "Parsing" }
+      ]
+    },
+    {
+      "_id": "4400-m2",
+      "course": "4400",
+      "name": "Week 2 — Semantics",
+      "lessons": [
+        { "name": "Operational Semantics" }
+      ]
+    },
+    {
+      "_id": "4400-m3",
+      "course": "4400",
+      "name": "Week 3 — Types",
+      "lessons": [
+        { "name": "Type Systems" }
+      ]
+    },
+  
+    {
+      "_id": "4700-m1",
+      "course": "4700",
+      "name": "Week 1 — Networking Overview",
+      "lessons": [
+        { "name": "OSI Model" },
+        { "name": "TCP/IP" }
+      ]
+    },
+    {
+      "_id": "4700-m2",
+      "course": "4700",
+      "name": "Week 2 — Link Layer",
+      "lessons": [
+        { "name": "Ethernet" }
+      ]
+    },
+    {
+      "_id": "4700-m3",
+      "course": "4700",
+      "name": "Week 3 — Network Layer",
+      "lessons": [
+        { "name": "IP, Routing" }
+      ]
+    },
+  
+    {
+      "_id": "3650-m1",
+      "course": "3650",
+      "name": "Week 1 — Computer Systems Overview",
+      "lessons": [
+        { "name": "Processes and Threads" },
+        { "name": "Memory Hierarchy Basics" }
+      ]
+    },
+    {
+      "_id": "2800-m1",
+      "course": "2800",
+      "name": "Week 1 — Logic & Computation Intro",
+      "lessons": [
+        { "name": "Propositional Logic" },
+        { "name": "Truth Tables" }
+      ]
+    },
+    {
+      "_id": "1800-m1",
+      "course": "1800",
+      "name": "Week 1 — Discrete Structures Intro",
+      "lessons": [
+        { "name": "Sets and Functions" }
+      ]
+    },
+    {
+      "_id": "1210-m1",
+      "course": "1210",
+      "name": "Week 1 — Professional Development Intro",
+      "lessons": [
+        { "name": "Career Goals & Planning" }
+      ]
+    }
+  ]
+  
