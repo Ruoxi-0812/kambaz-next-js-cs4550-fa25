@@ -8,7 +8,7 @@ import ModuleControlButtons from "./ModuleControlButtons";
 import { ListGroup, ListGroupItem } from "react-bootstrap";
 import { BsGripVertical } from "react-icons/bs";
 
-type Lesson = { name: string };
+type Lesson = { _id: string; name: string };
 type Module = { _id: string; course: string; name: string; lessons?: Lesson[] };
 
 export default function Modules() {
@@ -27,8 +27,8 @@ export default function Modules() {
             </div>
             {module.lessons && (
               <ListGroup className="wd-lessons rounded-0">
-                {module.lessons.map((lesson, i) => (
-                  <ListGroupItem key={`${module._id}-lesson-${i}`} className="wd-lesson p-3 ps-1">
+                {module.lessons.map((lesson) => (
+                  <ListGroupItem key={lesson._id} className="wd-lesson p-3 ps-1">
                     <BsGripVertical className="me-2 fs-3" /> {lesson.name} <LessonControlButtons />
                   </ListGroupItem>
                 ))}
