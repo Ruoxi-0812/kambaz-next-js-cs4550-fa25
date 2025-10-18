@@ -1,23 +1,23 @@
-import type { ReactNode } from "react";
-import CourseNavigation from "./Navigation";
 import { FaAlignJustify } from "react-icons/fa6";
 import { courses } from "../../Database";
+import CourseNavigation from "./Navigation";
 import Breadcrumb from "./Breadcrumb";
 
-export default async function CoursesLayout({
-  children,
-  params,
-}: Readonly<{ children: ReactNode; params: Promise<{ cid: string }> }>) {
-  const { cid } = await params;                       
+interface CoursesLayoutProps {
+  children: React.ReactNode;
+  params: Promise<{ cid: string }>;
+}
+
+export default async function CoursesLayout({ children, params }: CoursesLayoutProps) {
+  const { cid } = await params;
   const course = courses.find((c) => c._id === cid);
 
   return (
     <div id="wd-courses">
       <h2 className="text-danger">
         <FaAlignJustify className="me-4 fs-4 mb-1" />
-        {course?.name}
+        <Breadcrumb course={course} />
       </h2>
-      <Breadcrumb course={course} />
       <hr />
       <div className="d-flex">
         <div className="d-none d-md-block">
