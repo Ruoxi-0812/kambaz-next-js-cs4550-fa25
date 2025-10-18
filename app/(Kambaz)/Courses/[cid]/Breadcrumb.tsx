@@ -4,13 +4,12 @@ import { usePathname } from "next/navigation";
 
 
 export default function Breadcrumb({ course }: { course: { name: string } | undefined; }) {
- const pathname = usePathname();
- const parts = pathname.split("/").filter(Boolean);     
-  const cidPos = parts.indexOf("Courses") + 1;         
-  const section = parts[cidPos + 1] || "";   
- return (
-   <span>
-     Course {course?.name} &gt; {section}
-   </span>
- );
+    const pathname = usePathname();
+    const section = pathname.split("/").pop();
+
+    return (
+      <span className="ms-1 text-danger fw-normal">
+        {course?.name} <span className="text-danger">&gt;</span> {section}
+      </span>
+    );
 }

@@ -1,6 +1,6 @@
 [
     {
-      "_id": "a1",
+      "_id": "A1",
       "course": "4550",
       "title": "A1",
       "description": "The assignment is available online.\n\nSubmit a link to the landing page of your Web application running on Netlify.\n\nThe landing page should include the following:\n• Your full name and section\n• Links to each of the lab assignments\n• Link to the Kanbas application\n• Links to all relevant source code repositories\n\nThe Kanbas application should include a link to navigate back to the landing page.",
@@ -11,7 +11,7 @@
       "dueISO": "2025-05-13"
     },
     {
-      "_id": "a2",
+      "_id": "A2",
       "course": "4550",
       "title": "A2",
       "description": "Assignment 2 description",
@@ -22,7 +22,7 @@
       "dueISO": "2025-05-20"
     },
     {
-      "_id": "a3",
+      "_id": "A3",
       "course": "4550",
       "title": "A3",
       "description": "Assignment 3 description",
@@ -34,7 +34,7 @@
     },
   
     {
-      "_id": "hw1",
+      "_id": "HW1",
       "course": "4400",
       "title": "HW1",
       "description": "Homework 1 description",
@@ -45,7 +45,7 @@
       "dueISO": "2025-09-09"
     },
     {
-      "_id": "hw2",
+      "_id": "HW2",
       "course": "4400",
       "title": "HW2",
       "description": "Homework 2 description",
@@ -69,7 +69,7 @@
     },
   
     {
-      "_id": "3650-a1",
+      "_id": "A1",
       "course": "3650",
       "title": "A1",
       "description": "Answer questions about processes, threads, and memory hierarchy. Include short explanations and a diagram.",
@@ -80,7 +80,7 @@
       "dueISO": "2025-09-08"
     },
     {
-      "_id": "2800-a1",
+      "_id": "A1",
       "course": "2800",
       "title": "A1",
       "description": "Build truth tables for given propositions and determine equivalences.",
@@ -91,7 +91,7 @@
       "dueISO": "2025-02-12"
     },
     {
-      "_id": "1800-a1",
+      "_id": "A1",
       "course": "1800",
       "title": "A1",
       "description": "Exercises on set operations and function properties (injective/surjective/bijective).",
@@ -102,7 +102,7 @@
       "dueISO": "2025-09-08"
     },
     {
-      "_id": "1210-a1",
+      "_id": "A1",
       "course": "1210",
       "title": "A1",
       "description": "Submit a one-page career plan including short-term and long-term goals and target roles.",
