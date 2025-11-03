@@ -1,23 +1,37 @@
 "use client";
 
 import React from "react";
-import { Button, FormControl, ListGroupItem } from 'react-bootstrap';
+import { Button, FormControl, ListGroupItem } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { addTodo, updateTodo, setTodo } from "./todosReducer";
 import { RootState } from "../../store";
-export default function TodoForm(
-//{ todo, setTodo, addTodo, updateTodo }
-) {
+
+export default function TodoForm() {
   const { todo } = useSelector((state: RootState) => state.todosReducer);
   const dispatch = useDispatch();
+
   return (
-    <ListGroupItem>
-      <Button onClick={() => dispatch(addTodo(todo))}
-              id="wd-add-todo-click"> Add </Button>
-      <Button onClick={() => dispatch(updateTodo(todo))}
-              id="wd-update-todo-click"> Update </Button>
+    <ListGroupItem className="d-flex align-items-center gap-2">
       <FormControl
-        defaultValue={todo.title}
-        onChange={(e) => dispatch(setTodo({ ...todo, title: e.target.value }))}/>
+        className="flex-grow-1"
+        value={todo.title}
+        placeholder="Learn Mongo"
+        onChange={(e) => dispatch(setTodo({ ...todo, title: e.target.value }))}
+      />
+      <Button
+        variant="warning"
+        onClick={() => dispatch(updateTodo(todo))}
+        id="wd-update-todo-click"
+      >
+        Update
+      </Button>
+      <Button
+        variant="success"
+        onClick={() => dispatch(addTodo(todo))}
+        id="wd-add-todo-click"
+      >
+        Add
+      </Button>
     </ListGroupItem>
-);}
+  );
+}

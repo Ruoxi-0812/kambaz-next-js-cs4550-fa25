@@ -14,8 +14,8 @@ type Credentials = {
 
 export default function Signin() {
   const [credentials, setCredentials] = useState<Credentials>({
-    username: "",
-    password: "",
+    username: "ruoxi",
+    password: "123456",
   });
 
   const dispatch = useDispatch();

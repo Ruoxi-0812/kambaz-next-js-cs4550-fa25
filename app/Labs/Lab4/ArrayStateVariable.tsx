@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "./store";
-import { ListGroup, ListGroupItem } from "react-bootstrap";
+import { ListGroup, ListGroupItem, Button } from "react-bootstrap";
 
 export default function ArrayStateVariable() {
   const { todos } = useSelector((state: RootState) => state.todosReducer);
-
   const [array, setArray] = useState([1, 2, 3, 4, 5]);
 
   const addElement = () => {
@@ -17,17 +16,38 @@ export default function ArrayStateVariable() {
   };
 
   return (
-    <div id="wd-array-state-variables">
+    <div>
       <h2>Array State Variable</h2>
 
-      <button onClick={addElement}>Add Element</button>
-      <ul>
+      <Button
+        variant="success"
+        className="mb-3"
+        onClick={addElement}
+        id="wd-add-element-btn"
+      >
+        Add Element
+      </Button>
+
+      <ListGroup className="mb-3">
         {array.map((item, index) => (
-          <li key={index}> {item}
-            <button onClick={() => deleteElement(index)}>Delete</button>
-          </li>
+          <ListGroupItem
+            key={index}
+            className="d-flex justify-content-between align-items-center"
+          >
+            <span>{item}</span>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => deleteElement(index)}
+              id={`wd-delete-element-${index}`}
+            >
+              Delete
+            </Button>
+          </ListGroupItem>
         ))}
-      </ul><hr />
+      </ListGroup>
+
+      <hr />
 
       <ListGroup>
         {todos.map((todo: { id: string; title: string }) => (

@@ -135,11 +135,21 @@ export default function Dashboard() {
         </>
       )}
 
-      <h2 id="wd-dashboard-published">
-        Published Courses ({visibleCourses.length})
-      </h2>
-      <hr />
-
+      {!currentUser ? (
+        <>
+          <h2 id="wd-dashboard-please-sign" className="text-danger">
+            Please sign in to view your courses
+          </h2>
+          <hr />
+        </>
+      ) : (
+        <>
+          <h2 id="wd-dashboard-published">
+            Published Courses ({visibleCourses.length})
+          </h2>
+          <hr />
+        </>
+      )}
       <div id="wd-dashboard-courses">
         <Row xs={1} md={5} className="g-4">
           {visibleCourses.map((c) => {
@@ -150,7 +160,26 @@ export default function Dashboard() {
                 className="wd-dashboard-course"
                 style={{ width: "300px" }}
               >
-                <Card>
+                <Card className="position-relative">
+                  <Button
+                    size="sm"
+                    variant={enrolled ? "danger" : "success"}
+                    className="position-absolute top-0 end-0 m-2 px-3 py-1"
+                    id={
+                      enrolled
+                        ? "wd-unenroll-course-click"
+                        : "wd-enroll-course-click"
+                    }
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleEnroll(c._id);
+                    }}
+                    aria-label={enrolled ? "Unenroll" : "Enroll"}
+                  >
+                    {enrolled ? "Unenroll" : "Enroll"}
+                  </Button>
+                  
                   <Link
                     href={`/Courses/${c._id}/Home`}
                     className="wd-dashboard-course-link text-decoration-none text-dark"
@@ -178,51 +207,30 @@ export default function Dashboard() {
                           Go
                         </Button>
 
-                        <div className="d-flex gap-2">
-                          {isFaculty && (
-                            <>
-                              <Button
-                                id="wd-edit-course-click"
-                                className="btn btn-warning px-3"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  startEdit(c);
-                                }}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                id="wd-delete-course-click"
-                                className="btn btn-danger px-3"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  dispatch(deleteCourse(c._id));
-                                }}
-                              >
-                                Delete
-                              </Button>
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="d-flex mt-2">
-                        <Button
-                          className="me-auto" 
-                          style={{ width: 90 }}
-                          variant={enrolled ? "danger" : "success"}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            toggleEnroll(c._id);
-                          }}
-                          id={
-                            enrolled
-                              ? "wd-unenroll-course-click"
-                              : "wd-enroll-course-click"
-                          }
-                        >
-                          {enrolled ? "Unenroll" : "Enroll"}
-                        </Button>
+                        {isFaculty && (
+                          <div className="d-flex gap-2">
+                            <Button
+                              id="wd-edit-course-click"
+                              className="btn btn-warning px-3"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                startEdit(c);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              id="wd-delete-course-click"
+                              className="btn btn-danger px-3"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                dispatch(deleteCourse(c._id));
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </CardBody>
                   </Link>
