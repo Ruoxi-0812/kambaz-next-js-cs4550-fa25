@@ -1,58 +1,96 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import * as db from "../../../../Database";
-
-import Form from "react-bootstrap/Form";
-import FormGroup from "react-bootstrap/FormGroup";
-import FormLabel from "react-bootstrap/FormLabel";
-import FormControl from "react-bootstrap/FormControl";
-import FormCheck from "react-bootstrap/FormCheck";
-import FormSelect from "react-bootstrap/FormSelect";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
-
-type Assignment = {
-  _id: string;
-  course: string;
-  title: string;
-  description: string;
-  points: number;
-  due?: string;
-  available?: string;
-  until?: string;
-  dueISO?: string;
-  availableISO?: string;
-  untilISO?: string;
-};
+import { useParams, useRouter } from "next/navigation";
+import {
+  Form,
+  FormGroup,
+  FormLabel,
+  FormControl,
+  FormSelect,
+  Row,
+  Col,
+  Card,
+  Button,
+} from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { useMemo, useState } from "react";
+import type { RootState, AppDispatch } from "../../../../store";
+import {
+  addAssignment,
+  updateAssignment,
+  type Assignment,
+} from "../reducer";
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams<{ cid: string; aid: string }>();
-  const a = (db.assignments as Assignment[]).find(
-    (x) => x.course === String(cid) && x._id === String(aid)
+  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const all = useSelector((s: RootState) => s.assignmentsReducer.assignments);
+  const existing = useMemo(
+    () => all.find((x) => x._id === aid && x.course === cid),
+    [all, aid, cid]
   );
 
-  if (!a) return null;
+  const isNew = aid === "new";
+
+  const [title, setTitle] = useState<string>(existing?.title ?? "New Assignment");
+  const [description, setDescription] = useState<string>(existing?.description ?? "New Assignment Description");
+  const [points, setPoints] = useState<number>(existing?.points ?? 100);
+  const [dueISO, setDueISO] = useState<string>(existing?.dueISO ?? "");
+  const [availableISO, setAvailableISO] = useState<string>(existing?.availableISO ?? "");
+  const [untilISO, setUntilISO] = useState<string>(existing?.untilISO ?? "");
+
+  const save = () => {
+    if (isNew) {
+      dispatch(
+        addAssignment({
+          course: String(cid),
+          title,
+          description,
+          points,
+          dueISO,
+          availableISO,
+          untilISO,
+        })
+      );
+    } else if (existing) {
+      const updated: Assignment = {
+        ...existing,
+        title,
+        description,
+        points,
+        dueISO,
+        availableISO,
+        untilISO,
+      };
+      dispatch(updateAssignment(updated));
+    }
+    router.push(`/Courses/${cid}/Assignments`);
+  };
 
   return (
     <div id="wd-assignments-editor" className="p-3">
       <Form>
         <FormGroup className="mb-3" controlId="wd-name">
           <FormLabel>Assignment Name</FormLabel>
-          <FormControl type="text" defaultValue={a.title} />
+          <FormControl type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
         </FormGroup>
 
         <FormGroup className="mb-3" controlId="wd-description">
           <FormLabel>Description</FormLabel>
-          <FormControl as="textarea" rows={10} defaultValue={a.description} />
+          <FormControl as="textarea" rows={10} value={description} onChange={(e) => setDescription(e.target.value)} />
         </FormGroup>
 
         <FormGroup as={Row} className="mb-3" controlId="wd-points">
           <FormLabel column sm={2}>Points</FormLabel>
           <Col sm={4}>
-            <FormControl type="number" defaultValue={a.points ?? 100} />
+            <FormControl
+              type="number"
+              value={points}
+              onChange={(e) => setPoints(Number(e.target.value))}
+            />
           </Col>
         </FormGroup>
 
@@ -64,18 +102,6 @@ export default function AssignmentEditor() {
               <option value="QUIZZES">QUIZZES</option>
               <option value="EXAMS">EXAMS</option>
               <option value="PROJECT">PROJECT</option>
-            </FormSelect>
-          </Col>
-        </FormGroup>
-
-        <FormGroup as={Row} className="mb-3" controlId="wd-display-grade-as">
-          <FormLabel column sm={2}>Display Grade as</FormLabel>
-          <Col sm={4}>
-            <FormSelect defaultValue="Percentage">
-              <option value="Percentage">Percentage</option>
-              <option value="Points">Points</option>
-              <option value="Letter Grade">Letter Grade</option>
-              <option value="GPA">GPA</option>
             </FormSelect>
           </Col>
         </FormGroup>
@@ -94,11 +120,11 @@ export default function AssignmentEditor() {
             <FormGroup>
               <FormLabel>Online Entry Options</FormLabel>
               <div>
-                <FormCheck type="checkbox" label="Text Entry" />
-                <FormCheck type="checkbox" label="Website URL" defaultChecked />
-                <FormCheck type="checkbox" label="Media Recordings" />
-                <FormCheck type="checkbox" label="Student Annotation" />
-                <FormCheck type="checkbox" label="File Uploads" />
+                <Form.Check type="checkbox" label="Text Entry" />
+                <Form.Check type="checkbox" label="Website URL" defaultChecked />
+                <Form.Check type="checkbox" label="Media Recordings" />
+                <Form.Check type="checkbox" label="Student Annotation" />
+                <Form.Check type="checkbox" label="File Uploads" />
               </div>
             </FormGroup>
           </Card.Body>
@@ -106,16 +132,11 @@ export default function AssignmentEditor() {
 
         <Card className="mb-3">
           <Card.Body>
-            <FormGroup className="mb-3">
-              <FormLabel>Assign to</FormLabel>
-              <FormControl type="text" defaultValue="Everyone" />
-            </FormGroup>
-
             <Row className="mb-3">
               <Col sm={4}>
                 <FormGroup controlId="wd-due-date">
                   <FormLabel>Due</FormLabel>
-                  <FormControl type="date" defaultValue={a.dueISO ? a.dueISO : ""} />
+                  <FormControl type="date" value={dueISO} onChange={(e) => setDueISO(e.target.value)} />
                 </FormGroup>
               </Col>
             </Row>
@@ -124,13 +145,17 @@ export default function AssignmentEditor() {
               <Col sm={4}>
                 <FormGroup controlId="wd-available-from">
                   <FormLabel>Available from</FormLabel>
-                  <FormControl type="date" defaultValue={a.availableISO ? a.availableISO : ""} />
+                  <FormControl
+                    type="date"
+                    value={availableISO}
+                    onChange={(e) => setAvailableISO(e.target.value)}
+                  />
                 </FormGroup>
               </Col>
               <Col sm={4}>
                 <FormGroup controlId="wd-available-until">
                   <FormLabel>Until</FormLabel>
-                  <FormControl type="date" defaultValue={a.untilISO ? a.untilISO : ""} />
+                  <FormControl type="date" value={untilISO} onChange={(e) => setUntilISO(e.target.value)} />
                 </FormGroup>
               </Col>
             </Row>
@@ -141,9 +166,9 @@ export default function AssignmentEditor() {
           <Link href={`/Courses/${cid}/Assignments`} className="btn btn-secondary me-2">
             Cancel
           </Link>
-          <Link href={`/Courses/${cid}/Assignments`} className="btn btn-danger">
+          <Button className="btn btn-danger" onClick={save}>
             Save
-          </Link>
+          </Button>
         </div>
       </Form>
     </div>

@@ -1,30 +1,32 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ListGroup, ListGroupItem, Button, Form, InputGroup } from "react-bootstrap";
+import {
+  ListGroup,
+  ListGroupItem,
+  Button,
+  Form,
+  InputGroup,
+} from "react-bootstrap";
 import { BsGripVertical, BsPlus, BsThreeDotsVertical } from "react-icons/bs";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaCaretDown } from "react-icons/fa";
 import { LiaBookSolid } from "react-icons/lia";
-import { FaCaretDown } from "react-icons/fa";
-import AssignmentControlButtons from "./AssignmentControlButtons";
-import * as db from "../../../Database";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "../../../store";
+import { deleteAssignment, type Assignment } from "./reducer";
 import "./assignments.css";
-
-type Assignment = {
-  _id: string;
-  course: string;
-  title: string;
-  available: string;
-  due: string;
-  points: number;
-};
+import { useRouter, useParams } from "next/navigation";
+import AssignmentControlButtons from "./AssignmentControlButtons";
 
 export default function Assignments() {
   const { cid } = useParams<{ cid: string }>();
-  const assignments = (db.assignments as Assignment[]).filter(
-    (a) => a.course === String(cid)
-  );
+  const dispatch = useDispatch<AppDispatch>();
+
+  const assignments = useSelector(
+    (s: RootState) => s.assignmentsReducer.assignments
+  ).filter((a) => a.course === String(cid));
+
+  const router = useRouter();
 
   return (
     <div id="wd-assignments" className="p-3">
@@ -34,24 +36,34 @@ export default function Assignments() {
             <InputGroup.Text className="bg-white">
               <FaSearch className="text-secondary" />
             </InputGroup.Text>
-            <Form.Control type="text" placeholder="Search..." id="wd-search-assignments" />
+            <Form.Control
+              type="text"
+              placeholder="Search..."
+              id="wd-search-assignments"
+            />
           </InputGroup>
         </div>
         <div className="ms-3 flex-shrink-0">
-          <Button variant="secondary" className="me-2 group-btn" id="wd-add-group">
+          <Button
+            variant="secondary"
+            className="me-2 group-btn"
+            id="wd-add-group"
+          >
             + Group
           </Button>
-          <Button variant="danger" id="wd-add-assignment">
+          <Link
+            href={`/Courses/${cid}/Assignments/new`}
+            className="btn btn-danger"
+            id="wd-add-assignment"
+          >
             + Assignment
-          </Button>
+          </Link>
         </div>
       </div>
 
       <ListGroup className="rounded-0">
         <ListGroupItem className="wd-module p-0 mb-4 fs-5 border-gray w-100">
-          <div
-            className="wd-title wd-assn-header px-3 py-2 d-flex justify-content-between align-items-center border-bottom"
-          >
+          <div className="wd-title wd-assn-header px-3 py-2 d-flex justify-content-between align-items-center border-bottom">
             <span className="d-flex align-items-center">
               <BsGripVertical className="me-2 fs-5 text-muted" />
               <FaCaretDown className="me-2" />
@@ -65,7 +77,7 @@ export default function Assignments() {
           </div>
 
           <ListGroup className="wd-lessons rounded-0">
-            {assignments.map((a) => (
+            {assignments.map((a: Assignment) => (
               <ListGroupItem
                 key={a._id}
                 className="wd-lesson wd-left-accent py-3 ps-0 pe-3 d-flex align-items-start justify-content-between border-0 border-bottom"
@@ -85,16 +97,24 @@ export default function Assignments() {
                     <div className="text-muted small mt-1">
                       <span className="text-danger">Multiple Modules</span>
                       <span className="mx-2 text-muted">|</span>
-                      <b>Not available until</b> {a.available} |
+                      <b>Not available until</b>{" "}
+                      {a.available ?? a.availableISO ?? ""} |
                     </div>
                     <div className="text-muted small">
-                      <b>Due</b> {a.due}
+                      <b>Due</b> {a.due ?? a.dueISO ?? ""}
                       <span className="mx-2 text-muted">|</span>
                       {a.points} pts
                     </div>
                   </div>
                 </div>
-                <AssignmentControlButtons />
+
+                <AssignmentControlButtons
+                  title={a.title}
+                  onEdit={() =>
+                    router.push(`/Courses/${cid}/Assignments/${a._id}`)
+                  }
+                  onDelete={() => dispatch(deleteAssignment(a._id))}
+                />
               </ListGroupItem>
             ))}
           </ListGroup>
