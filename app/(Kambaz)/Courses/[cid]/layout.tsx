@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "next/navigation";
-import { redirect } from "next/dist/client/components/navigation";
+import { useParams, redirect } from "next/navigation";
 import { RootState } from "../../store";
 import CourseNavigation from "./Navigation";
 import { FaAlignJustify } from "react-icons/fa6";
@@ -38,15 +37,19 @@ export default function CoursesLayout({ children }: { children: React.ReactNode 
       redirect("/Account/Signin");
       return;
     }
-    const isFaculty =
-      currentUser.role === "FACULTY" || currentUser.role === "ADMIN";
-    if (isFaculty) return;
 
-    const ok = enrollments.some(
+    if (!course) {
+      redirect("/Dashboard");
+      return;
+    }
+    
+    const enrolled = enrollments.some(
       (e) => e.user === currentUser._id && e.course === String(cid)
     );
-    if (!ok) redirect("/Dashboard");
-  }, [cid, currentUser, enrollments]);
+    if (!enrolled) {
+      redirect("/Dashboard");
+    }
+  }, [cid, currentUser, enrollments, course]);
 
   const [showNav, setShowNav] = useState(true);
 
