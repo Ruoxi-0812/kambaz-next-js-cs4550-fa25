@@ -8,11 +8,9 @@ interface Todo {
   id: string;
   title: string;
 }
-
 interface RootState {
   todosReducer: { todos: Todo[] };
 }
-
 export default function TodoList() {
   const { todos } = useSelector((state: RootState) => state.todosReducer);
   return (

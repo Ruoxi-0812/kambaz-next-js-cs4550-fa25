@@ -12,7 +12,6 @@ interface Todo {
 interface RootState {
   todosReducer: { todo: Todo };
 }
-
 export default function TodoForm() {
   const { todo } = useSelector((state: RootState) => state.todosReducer);
   const dispatch = useDispatch();

@@ -7,6 +7,7 @@ import { redirect } from "next/dist/client/components/navigation";
 import { RootState } from "../../store";
 import CourseNavigation from "./Navigation";
 import { FaAlignJustify } from "react-icons/fa6";
+import Breadcrumb from "./Breadcrumb";
 
 type Course = {
   _id: string;
@@ -59,6 +60,7 @@ export default function CoursesLayout({ children }: { children: React.ReactNode 
           onClick={() => setShowNav((v) => !v)}
         />
         {course?.name ?? "Course"}
+        <Breadcrumb course={course} />
       </h2>
       <hr />
 

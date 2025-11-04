@@ -43,8 +43,6 @@ export default function Dashboard() {
 
   const userId = currentUser?._id ?? null;
 
-  // enrolling=false: 仅“我的课程”；按钮文字：All Courses（点击去所有课程）
-  // enrolling=true : 显示所有课程+Enroll/Unenroll；按钮文字：My Courses（点击回我的课程）
   const [enrolling, setEnrolling] = useState(false);
 
   const [course, setCourse] = useState<Course>({
@@ -98,47 +96,48 @@ export default function Dashboard() {
       </div>
 
       <hr />
+      
+      {currentUser && (
+        <>
+          <h5 className="mb-2">
+            New Course
+            <Button
+              className="btn btn-primary float-end"
+              id="wd-add-new-course-click"
+              onClick={() => dispatch(addNewCourse(course))}
+            >
+              Add
+            </Button>
+            <Button
+              className="btn btn-warning float-end me-2"
+              id="wd-update-course-click"
+              onClick={() => dispatch(updateCourse(course))}
+            >
+              Update
+            </Button>
+          </h5>
 
-      {/* 教师功能区：不再按角色隐藏，始终显示，方便 grader 测试 */}
-      <>
-        <h5 className="mb-2">
-          New Course
-          <Button
-            className="btn btn-primary float-end"
-            id="wd-add-new-course-click"
-            onClick={() => dispatch(addNewCourse(course))}
-          >
-            Add
-          </Button>
-          <Button
-            className="btn btn-warning float-end me-2"
-            id="wd-update-course-click"
-            onClick={() => dispatch(updateCourse(course))}
-          >
-            Update
-          </Button>
-        </h5>
-
-        <FormControl
-          className="mb-2"
-          value={course.name}
-          onChange={(e) => setCourse({ ...course, name: e.target.value })}
-          placeholder="Course name"
-          aria-label="Course name"
-        />
-        <FormControl
-          className="mb-2"
-          value={course.description}
-          onChange={(e) =>
-            setCourse({ ...course, description: e.target.value })
-          }
-          as="textarea"
-          rows={3}
-          placeholder="Course description"
-          aria-label="Course description"
-        />
-        <hr />
-      </>
+          <FormControl
+            className="mb-2"
+            value={course.name}
+            onChange={(e) => setCourse({ ...course, name: e.target.value })}
+            placeholder="Course name"
+            aria-label="Course name"
+          />
+          <FormControl
+            className="mb-2"
+            value={course.description}
+            onChange={(e) =>
+              setCourse({ ...course, description: e.target.value })
+            }
+            as="textarea"
+            rows={3}
+            placeholder="Course description"
+            aria-label="Course description"
+          />
+          <hr />
+        </>
+      )}
 
       {!currentUser ? (
         <>
@@ -165,7 +164,6 @@ export default function Dashboard() {
             return (
               <Col key={c._id} className="wd-dashboard-course" style={{ width: "300px" }}>
                 <Card className="position-relative">
-                  {/* Enroll/Unenroll 只在 All Courses 模式显示 */}
                   {enrolling && (
                     <Button
                       size="sm"
@@ -212,7 +210,6 @@ export default function Dashboard() {
                       <div className="d-flex justify-content-between align-items-center mt-2">
                         <Button variant="primary" className="px-3">Go</Button>
 
-                        {/* Edit / Delete 始终显示，方便 grader 验证 */}
                         <div className="d-flex gap-2">
                           <Button
                             id={`wd-edit-course-click-${c._id}`}
