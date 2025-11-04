@@ -100,8 +100,8 @@
     "course": "2800",
     "title": "A1",
     "details": "<span class='text-danger'>Module 1</span> | <b>Not available until</b> May 7 at 12:00am | <b>Due</b> May 14 at 11:59pm | 80 pts",
-    "description": "Complete exercises on logical equivalence, normal forms, and symbolic computation. Demonstrate understanding through examples of evaluation and proof construction.",
-    "points": 80,
+    "description": "Complete exercises on logical equivalence, normal forms, and symbolic computation.",
+    "points": 100,
     "group": "ASSIGNMENTS",
     "displayGradeAs": "Points",
     "submissionType": "Online",
@@ -111,6 +111,7 @@
     "availableFrom": "2024-05-07",
     "availableUntil": "2024-05-21"
   },  
+  
   {
     "_id": "1800-A1",
     "course": "1800",
