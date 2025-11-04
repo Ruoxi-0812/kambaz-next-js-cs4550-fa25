@@ -288,7 +288,7 @@ export default function AssignmentEditor() {
           </CardBody>
         </Card>
 
-        <div className="mt-4">
+        <div className="mt-4 d-flex justify-content-end">
           <Link
             href={`/Courses/${cid}/Assignments`}
             className="btn btn-secondary me-2"
