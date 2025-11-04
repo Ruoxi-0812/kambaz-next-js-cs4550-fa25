@@ -1,55 +1,55 @@
-"use client";
-
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { assignments as dbAssignments } from "../../../Database";
+import { createSlice } from "@reduxjs/toolkit";
+import { assignments } from "../../../Database";
 import { v4 as uuidv4 } from "uuid";
 
-export interface Assignment {
+interface Assignment {
   _id: string;
-  course: string;
   title: string;
   description: string;
+  course: string;
   points: number;
-  available?: string;
-  due?: string;
-  availableISO?: string;
-  dueISO?: string;
-  untilISO?: string;
+  dueDate?: string;
+  availableFrom?: string;
+  availableUntil?: string;
 }
 
-interface AssignmentsState {
-  assignments: Assignment[];
-}
-
-const initialState: AssignmentsState = {
-  assignments: dbAssignments as Assignment[],
+const initialState = {
+  assignments: assignments as Assignment[],
 };
-
 const assignmentsSlice = createSlice({
   name: "assignments",
   initialState,
   reducers: {
-    addAssignment: (
-      state,
-      action: PayloadAction<
-        Omit<Assignment, "_id"> & Partial<Pick<Assignment, "available" | "due">>
-      >
-    ) => {
-      const a: Assignment = { _id: uuidv4(), ...action.payload };
-      state.assignments = [...state.assignments, a];
+    addAssignment: (state, { payload: assignment }: { payload: Assignment }) => {
+      const newAssignment: Assignment = {
+        _id: uuidv4(),
+        title: assignment.title,
+        description: assignment.description,
+        course: assignment.course,
+        points: assignment.points,
+        dueDate: assignment.dueDate,
+        availableFrom: assignment.availableFrom,
+        availableUntil: assignment.availableUntil,
+      };
+      state.assignments = [...state.assignments, newAssignment];
     },
-    updateAssignment: (state, action: PayloadAction<Assignment>) => {
-      state.assignments = state.assignments.map((x) =>
-        x._id === action.payload._id ? action.payload : x
+    deleteAssignment: (state, { payload: assignmentId }: { payload: string }) => {
+      state.assignments = state.assignments.filter((a) => a._id !== assignmentId);
+    },
+    updateAssignment: (state, { payload: assignment }: { payload: Assignment }) => {
+      state.assignments = state.assignments.map((a) =>
+        a._id === assignment._id ? { ...a, ...assignment } : a
       );
     },
-    deleteAssignment: (state, action: PayloadAction<string>) => {
-      state.assignments = state.assignments.filter((x) => x._id !== action.payload);
+    editAssignment: (state, { payload: assignmentId }: { payload: string }) => {
+      state.assignments = state.assignments.map((a) =>
+        a._id === assignmentId ? { ...a, editing: true } : a
+      );
     },
   },
 });
 
-export const { addAssignment, updateAssignment, deleteAssignment } =
+export const { addAssignment, deleteAssignment, updateAssignment, editAssignment } =
   assignmentsSlice.actions;
+
 export default assignmentsSlice.reducer;
-export type { AssignmentsState };

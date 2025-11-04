@@ -1,5 +1,18 @@
 [
   {
+    "_id": "899",
+    "firstName": "Ruoxi",
+    "lastName": "Wang",
+    "username": "ruoxi",
+    "password": "123456",
+    "loginId": "001234567C",
+    "section": "S202",
+    "role": "STUDENT",
+    "email": "ruoxi.wang@example.com",
+    "lastActivity": "2021-11-14",
+    "totalActivity": "04:22:10"
+  },
+  {
     "_id": "123",
     "firstName": "Tony",
     "lastName": "Stark",
@@ -88,19 +101,6 @@
     "role": "TA",
     "email": "stephen.strange@example.com",
     "lastActivity": "2020-11-14",
-    "totalActivity": "04:22:10"
-  },
-  {
-    "_id": "899",
-    "firstName": "Ruoxi",
-    "lastName": "Wang",
-    "username": "ruoxi",
-    "password": "123456",
-    "loginId": "001234567C",
-    "section": "S202",
-    "role": "FACULTY",
-    "email": "ruoxi.wang@example.com",
-    "lastActivity": "2021-11-14",
     "totalActivity": "04:22:10"
   }
 ]

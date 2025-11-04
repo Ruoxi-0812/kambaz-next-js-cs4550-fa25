@@ -1,11 +1,11 @@
+"use client";
 import { useState } from "react";
+import { Button, ListGroup, ListGroupItem } from "react-bootstrap";
 import { useSelector } from "react-redux";
-import { RootState } from "./store";
-import { ListGroup, ListGroupItem, Button } from "react-bootstrap";
 
 export default function ArrayStateVariable() {
-  const { todos } = useSelector((state: RootState) => state.todosReducer);
-  const [array, setArray] = useState([1, 2, 3, 4, 5]);
+  const { todos } = useSelector((state: { todosReducer: { todos: { id: string; title: string }[] } }) => state.todosReducer);
+  const [array, setArray] = useState<number[]>([1, 2, 3, 4, 5]);
 
   const addElement = () => {
     setArray([...array, Math.floor(Math.random() * 100)]);
@@ -16,41 +16,39 @@ export default function ArrayStateVariable() {
   };
 
   return (
-    <div>
+    <div id="wd-array-state-variables">
       <h2>Array State Variable</h2>
 
       <Button
         variant="success"
-        className="mb-3"
         onClick={addElement}
-        id="wd-add-element-btn"
+        id="wd-add-element-click"
+        className="mb-2"
       >
         Add Element
       </Button>
 
-      <ListGroup className="mb-3">
+      <ul className="list-unstyled">
         {array.map((item, index) => (
-          <ListGroupItem
+          <li
             key={index}
-            className="d-flex justify-content-between align-items-center"
+            className="d-flex justify-content-between align-items-center border rounded p-2 mb-1"
           >
             <span>{item}</span>
             <Button
               variant="danger"
               size="sm"
               onClick={() => deleteElement(index)}
-              id={`wd-delete-element-${index}`}
+              id={`wd-delete-element-${index}-click`}
             >
               Delete
             </Button>
-          </ListGroupItem>
+          </li>
         ))}
-      </ListGroup>
-
-      <hr />
+      </ul>
 
       <ListGroup>
-        {todos.map((todo: { id: string; title: string }) => (
+        {todos.map((todo) => (
           <ListGroupItem key={todo.id}>{todo.title}</ListGroupItem>
         ))}
       </ListGroup>

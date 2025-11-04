@@ -1,72 +1,34 @@
-"use client";
-
-import { useState } from "react";
-import { Modal, Button } from "react-bootstrap";
-import { FaTrash, FaPencil } from "react-icons/fa6";
 import { IoEllipsisVertical } from "react-icons/io5";
+import { FaTrash } from "react-icons/fa";
+import { FaPencilAlt } from "react-icons/fa"; 
 import GreenCheckmark from "../Modules/GreenCheckmark";
 
 export default function AssignmentControlButtons({
-  onDelete,
+  assignmentId,
+  deleteAssignment,
   onEdit,
-  title,
 }: {
-  onDelete: () => void;
-  onEdit?: () => void;
-  title?: string;
+  assignmentId: string;
+  deleteAssignment: (assignmentId: string) => void;
+  onEdit: (assignmentId: string) => void; 
 }) {
-  const [show, setShow] = useState(false);
-
   return (
-    <>
-      <div className="d-flex align-items-center justify-content-end gap-2">
-        {onEdit && (
-          <FaPencil
-            onClick={onEdit}
-            className="text-primary"
-            role="button"
-            title="Edit"
-            style={{ fontSize: "1.3rem" }}
-          />
-        )}
+    <div className="d-flex align-items-center">
+      <FaPencilAlt
+        className="text-primary me-3 mb-1"
+        role="button"
+        title="Edit Assignment"
+        onClick={() => onEdit(assignmentId)}
+      />
 
-        <FaTrash
-          className="text-danger"
-          role="button"
-          title="Delete"
-          style={{ fontSize: "1.3rem" }}
-          onClick={() => setShow(true)}
-        />
-
-        <span style={{ position: "relative", top: "0px" }}>
-          <GreenCheckmark />
-        </span>
-        <IoEllipsisVertical className="fs-4 text-secondary" role="button" />
-      </div>
-      
-      <Modal show={show} onHide={() => setShow(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Delete Assignment</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete
-          {title ? ` “${title}”` : " this assignment"}?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShow(false)}>
-            Cancel
-          </Button>
-          <Button
-            variant="danger"
-            onClick={() => {
-              onDelete();
-              setShow(false);
-            }}
-          >
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+      <FaTrash
+        className="text-danger me-3 mb-1"
+        role="button"
+        title="Delete Assignment"
+        onClick={() => deleteAssignment(assignmentId)}
+      />
+      <GreenCheckmark />
+      <IoEllipsisVertical className="fs-4 text-secondary" />
+    </div>
   );
 }

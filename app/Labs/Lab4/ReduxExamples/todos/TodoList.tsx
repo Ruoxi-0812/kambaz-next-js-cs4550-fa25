@@ -1,22 +1,26 @@
-"use client";
-
-import { ListGroup } from "react-bootstrap";
 import React from "react";
 import TodoForm from "./TodoForm";
 import TodoItem from "./TodoItem";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store";
+import { ListGroup } from "react-bootstrap";
 
-type Todo = { id: string; title: string };
+interface Todo {
+  id: string;
+  title: string;
+}
+
+interface RootState {
+  todosReducer: { todos: Todo[] };
+}
 
 export default function TodoList() {
   const { todos } = useSelector((state: RootState) => state.todosReducer);
   return (
     <div id="wd-todo-list-redux">
-      <h2 className="mb-3">Todo List</h2>
-      <ListGroup className="mb-3">
+      <h2>Todo List</h2>
+      <ListGroup>
         <TodoForm />
-        {todos.map((todo: Todo) => (
+        {todos.map((todo) => (
           <TodoItem key={todo.id} todo={todo} />
         ))}
       </ListGroup>
