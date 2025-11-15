@@ -1,9 +1,10 @@
 import axios from "axios";
-import { HTTP_SERVER } from "../../client"; 
+
 import type { Assignment as StoreAssignment } from "./reducer";
 
 export type Assignment = StoreAssignment;
 
+const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
 const COURSES_API = `${HTTP_SERVER}/api/courses`;
 const ASSIGNMENTS_API = `${HTTP_SERVER}/api/assignments`;
 

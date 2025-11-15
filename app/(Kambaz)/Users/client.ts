@@ -1,8 +1,8 @@
 import axios from "axios";
-import { HTTP_SERVER } from "../Courses/client";
 
 const axiosWithCredentials = axios.create({ withCredentials: true });
 
+const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
 const COURSES_API = `${HTTP_SERVER}/api/courses`;
 
 export type User = {
