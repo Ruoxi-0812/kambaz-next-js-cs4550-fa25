@@ -117,7 +117,7 @@ export default function Dashboard() {
 
   const onAddNewCourse = async () => {
     if (!currentUser) return;
-  
+
     try {
       const newCourse = await coursesClient.createCourse({
         name: course.name,
@@ -125,9 +125,11 @@ export default function Dashboard() {
         description: course.description,
         image: course.image,
       });
+
       dispatch(setCourses([...courses, newCourse]));
 
       if (newCourse._id) {
+        await enrollmentsClient.enroll(currentUser._id, newCourse._id);
         dispatch(
           enrollCourse({ user: currentUser._id, course: newCourse._id })
         );
