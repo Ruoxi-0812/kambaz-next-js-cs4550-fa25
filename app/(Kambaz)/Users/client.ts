@@ -1,6 +1,8 @@
 import axios from "axios";
 import { HTTP_SERVER } from "../Courses/client";
 
+const axiosWithCredentials = axios.create({ withCredentials: true });
+
 const COURSES_API = `${HTTP_SERVER}/api/courses`;
 
 export type User = {
@@ -15,7 +17,7 @@ export type User = {
 };
 
 export const fetchPeopleForCourse = async (courseId: string) => {
-  const { data } = await axios.get<User[]>(
+  const { data } = await axiosWithCredentials.get<User[]>(
     `${COURSES_API}/${courseId}/people`
   );
   return data;
@@ -25,7 +27,7 @@ export const createUserForCourse = async (
   courseId: string,
   user: Omit<User, "_id">
 ) => {
-  const { data } = await axios.post<User>(
+  const { data } = await axiosWithCredentials.post<User>(
     `${COURSES_API}/${courseId}/people`,
     user
   );
@@ -34,13 +36,18 @@ export const createUserForCourse = async (
 
 export const updateUserInCourse = async (courseId: string, user: User) => {
   if (!user._id) throw new Error("Missing _id in user");
-  const { data } = await axios.put<User>(
+  const { data } = await axiosWithCredentials.put<User>(
     `${COURSES_API}/${courseId}/people/${user._id}`,
     user
   );
   return data;
 };
 
-export const deleteUserFromCourse = async (courseId: string, userId: string) => {
-  await axios.delete(`${COURSES_API}/${courseId}/people/${userId}`);
+export const deleteUserFromCourse = async (
+  courseId: string,
+  userId: string
+) => {
+  await axiosWithCredentials.delete(
+    `${COURSES_API}/${courseId}/people/${userId}`
+  );
 };

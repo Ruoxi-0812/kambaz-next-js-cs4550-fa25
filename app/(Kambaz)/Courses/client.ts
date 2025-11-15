@@ -1,7 +1,8 @@
 import axios from "axios";
 import type { Module } from "./[cid]/Modules/reducer";
-
-const axiosWithCredentials = axios.create({ withCredentials: true });
+const axiosWithCredentials = axios.create({
+  withCredentials: true,
+});
 
 export const HTTP_SERVER =
   process.env.NEXT_PUBLIC_HTTP_SERVER || "http://localhost:4000";
@@ -20,8 +21,10 @@ export type Course = {
   image?: string;
 };
 
+// ALWAYS USE axiosWithCredentials !!!
+
 export const fetchAllCourses = async () => {
-  const { data } = await axios.get(COURSES_API);
+  const { data } = await axiosWithCredentials.get(COURSES_API);
   return data;
 };
 
@@ -41,17 +44,24 @@ export const createCourse = async (course: Course) => {
 };
 
 export const deleteCourse = async (id: string) => {
-  const { data } = await axios.delete(`${COURSES_API}/${id}`);
+  const { data } = await axiosWithCredentials.delete(
+    `${COURSES_API}/${id}`
+  );
   return data;
 };
 
 export const updateCourse = async (course: Course) => {
-  const { data } = await axios.put(`${COURSES_API}/${course._id}`, course);
+  const { data } = await axiosWithCredentials.put(
+    `${COURSES_API}/${course._id}`,
+    course
+  );
   return data;
 };
 
 export const findModulesForCourse = async (courseId: string) => {
-  const { data } = await axios.get(`${COURSES_API}/${courseId}/modules`);
+  const { data } = await axiosWithCredentials.get(
+    `${COURSES_API}/${courseId}/modules`
+  );
   return data;
 };
 
@@ -59,7 +69,7 @@ export const createModuleForCourse = async (
   courseId: string,
   module: { name: string }
 ) => {
-  const { data } = await axios.post(
+  const { data } = await axiosWithCredentials.post(
     `${COURSES_API}/${courseId}/modules`,
     module
   );
@@ -67,12 +77,14 @@ export const createModuleForCourse = async (
 };
 
 export const deleteModule = async (moduleId: string) => {
-  const { data } = await axios.delete(`${MODULES_API}/${moduleId}`);
+  const { data } = await axiosWithCredentials.delete(
+    `${MODULES_API}/${moduleId}`
+  );
   return data;
 };
 
 export const updateModule = async (module: Module) => {
-  const { data } = await axios.put(
+  const { data } = await axiosWithCredentials.put(
     `${MODULES_API}/${module._id}`,
     module
   );
