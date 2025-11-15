@@ -1,16 +1,32 @@
-"use client";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+const savedUser =
+  typeof window !== "undefined"
+    ? JSON.parse(localStorage.getItem("currentUser") || "null")
+    : null;
+
 const initialState = {
-  currentUser: null,
+  currentUser: savedUser,
 };
+
 const accountSlice = createSlice({
-  name: "account",
+  name: "accountReducer",
   initialState,
   reducers: {
-    setCurrentUser: (state, action) => {
+    setCurrentUser: (state, action: PayloadAction<unknown>) => {
       state.currentUser = action.payload;
+      if (typeof window !== "undefined") {
+        localStorage.setItem("currentUser", JSON.stringify(action.payload));
+      }
+    },
+    clearCurrentUser: (state) => {
+      state.currentUser = null;
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("currentUser");
+      }
     },
   },
 });
-export const { setCurrentUser } = accountSlice.actions;
+
+export const { setCurrentUser, clearCurrentUser } = accountSlice.actions;
 export default accountSlice.reducer;
