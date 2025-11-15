@@ -125,7 +125,6 @@ export default function Dashboard() {
         description: course.description,
         image: course.image,
       });
-
       dispatch(setCourses([...courses, newCourse]));
 
       if (newCourse._id) {
@@ -133,16 +132,12 @@ export default function Dashboard() {
           enrollCourse({ user: currentUser._id, course: newCourse._id })
         );
       }
-
-      await fetchData();
-
       resetCourseForm();
     } catch (e) {
       console.error("Failed to add new course:", e);
     }
   };
   
-
   const onUpdateCourse = async () => {
     if (!course._id) return;
     try {
