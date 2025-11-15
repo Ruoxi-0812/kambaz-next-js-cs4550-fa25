@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
-import { redirect } from "next/dist/client/components/navigation";
+import { redirect } from "next/navigation";
 import { setCurrentUser } from "../reducer";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
-import * as db from "../../Database";
 import { FormControl, Button } from "react-bootstrap";
+import * as client from "../client";
 
 type Credentials = {
   username: string;
@@ -20,14 +20,9 @@ export default function Signin() {
 
   const dispatch = useDispatch();
 
-  const signin = () => {
-    const user = (db.users as Array<{ username: string; password: string }>).find(
-      (u) =>
-        u.username === credentials.username &&
-        u.password === credentials.password
-    );
+  const signin = async () => {
+    const user = await client.signin(credentials);
     if (!user) return;
-
     dispatch(setCurrentUser(user));
     redirect("/Dashboard");
   };
@@ -57,7 +52,7 @@ export default function Signin() {
         id="wd-password"
       />
 
-      <Button onClick={signin} id="wd-signin-btn" className="w-100">
+      <Button onClick={signin} id="wd-signin-btn" className="w-100 mb-2">
         Sign in
       </Button>
 

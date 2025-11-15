@@ -12,24 +12,18 @@ import {
   Button,
   FormControl,
 } from "react-bootstrap";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store";
-import { addNewCourse, deleteCourse, updateCourse } from "../Courses/reducer";
+import { setCourses } from "../Courses/reducer";
 import {
   enroll as enrollAction,
   unenroll as unenrollAction,
+  setEnrollments,
 } from "../Courses/[cid]/Enrollments/reducer";
-
-type Course = {
-  _id: string;
-  name: string;
-  description: string;
-  image?: string;
-  number?: string;
-  startDate?: string;
-  endDate?: string;
-};
+import * as coursesClient from "../Courses/client";
+import * as enrollmentsClient from "../Enrollments/client";
+import type { Course } from "../Courses/reducer";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -68,28 +62,97 @@ export default function Dashboard() {
     return enrolling ? courses : courses.filter((c) => isEnrolled(c._id));
   }, [enrolling, courses, enrollments, userId]);
 
-  const toggleEnroll = (courseId: string) => {
+  const fetchData = async () => {
+    if (!currentUser) {
+      dispatch(setCourses([]));
+      dispatch(setEnrollments([]));
+      return;
+    }
+    try {
+      const [allCourses, myEnrollments] = await Promise.all([
+        coursesClient.fetchAllCourses(),
+        enrollmentsClient.fetchMyEnrollments(),
+      ]);
+      dispatch(setCourses(allCourses));
+      dispatch(
+        setEnrollments(
+          myEnrollments.map((e) => ({ user: e.user, course: e.course }))
+        )
+      );
+    } catch (e) {
+      console.error("Failed to load dashboard data:", e);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [currentUser]);
+
+  const onAddNewCourse = async () => {
+    if (!currentUser) return;
+    try {
+      const newCourse = await coursesClient.createCourse(course);
+      dispatch(setCourses([...courses, newCourse]));
+      if (newCourse._id) {
+        dispatch(
+          enrollAction({ user: currentUser._id, course: newCourse._id })
+        );
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onUpdateCourse = async () => {
+    if (!course._id) return;
+    try {
+      const updated = await coursesClient.updateCourse(course);
+      dispatch(
+        setCourses(
+          courses.map((c) => (c._id === updated._id ? updated : c))
+        )
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onDeleteCourse = async (courseId: string) => {
+    try {
+      await coursesClient.deleteCourse(courseId);
+      dispatch(setCourses(courses.filter((c) => c._id !== courseId)));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const toggleEnroll = async (courseId: string) => {
     if (!userId) return;
-    if (isEnrolled(courseId)) {
-      dispatch(unenrollAction({ user: userId, course: courseId }));
-    } else {
-      dispatch(enrollAction({ user: userId, course: courseId }));
+    try {
+      if (isEnrolled(courseId)) {
+        await enrollmentsClient.unenrollFromCourse(courseId);
+        dispatch(unenrollAction({ user: userId, course: courseId }));
+      } else {
+        await enrollmentsClient.enrollInCourse(courseId);
+        dispatch(enrollAction({ user: userId, course: courseId }));
+      }
+    } catch (e) {
+      console.error(e);
     }
   };
 
   return (
     <div id="wd-dashboard" className="p-4">
       <div className="d-flex align-items-center justify-content-between">
-        <h1 id="wd-dashboard-title" className="mb-0">Dashboard</h1>
+        <h1 id="wd-dashboard-title" className="mb-0">
+          Dashboard
+        </h1>
         <Button
           id="wd-enrollments-toggle"
           variant="primary"
           onClick={() => setEnrolling((v) => !v)}
           disabled={!currentUser}
           aria-pressed={enrolling}
-          aria-label={
-            enrolling ? "Switch to My Courses view" : "Switch to All Courses view"
-          }
         >
           {enrolling ? "My Courses" : "All Courses"}
         </Button>
@@ -104,14 +167,14 @@ export default function Dashboard() {
             <Button
               className="btn btn-primary float-end"
               id="wd-add-new-course-click"
-              onClick={() => dispatch(addNewCourse(course))}
+              onClick={onAddNewCourse}
             >
               Add
             </Button>
             <Button
               className="btn btn-warning float-end me-2"
               id="wd-update-course-click"
-              onClick={() => dispatch(updateCourse(course))}
+              onClick={onUpdateCourse}
             >
               Update
             </Button>
@@ -162,7 +225,11 @@ export default function Dashboard() {
           {visibleCourses.map((c) => {
             const enrolled = isEnrolled(c._id);
             return (
-              <Col key={c._id} className="wd-dashboard-course" style={{ width: "300px" }}>
+              <Col
+                key={c._id}
+                className="wd-dashboard-course"
+                style={{ width: "300px" }}
+              >
                 <Card className="position-relative">
                   {enrolling && (
                     <Button
@@ -179,7 +246,6 @@ export default function Dashboard() {
                         e.stopPropagation();
                         toggleEnroll(c._id);
                       }}
-                      aria-label={enrolled ? "Unenroll" : "Enroll"}
                     >
                       {enrolled ? "Unenroll" : "Enroll"}
                     </Button>
@@ -208,7 +274,9 @@ export default function Dashboard() {
                       </CardText>
 
                       <div className="d-flex justify-content-between align-items-center mt-2">
-                        <Button variant="primary" className="px-3">Go</Button>
+                        <Button variant="primary" className="px-3">
+                          Go
+                        </Button>
 
                         <div className="d-flex gap-2">
                           <Button
@@ -226,7 +294,7 @@ export default function Dashboard() {
                             className="btn btn-danger px-3"
                             onClick={(e) => {
                               e.preventDefault();
-                              dispatch(deleteCourse(c._id));
+                              onDeleteCourse(c._id);
                             }}
                           >
                             Delete

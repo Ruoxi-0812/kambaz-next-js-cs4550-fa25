@@ -2,7 +2,6 @@
 
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import type { Assignment as BaseAssignment } from "./AssignmentAdd";
 import {
   ListGroup,
   ListGroupItem,
@@ -17,31 +16,31 @@ import { LiaBookSolid } from "react-icons/lia";
 import AssignmentControlButtons from "../Assignments/AssignmentControlButtons";
 import "./assignments.css";
 import AssignmentChange from "./AssignmentAdd";
-import { addAssignment, deleteAssignment } from "./reducer";
+import {
+  deleteAssignmentInState,
+  setAssignments,
+} from "./reducer";
 import { useSelector, useDispatch } from "react-redux";
-import { useState } from "react";
-
-type AssignmentFull = BaseAssignment & {
-  _id: string;
-  course: string;
-  dueDate?: string;
-};
+import { useState, useEffect } from "react";
+import type { Assignment } from "./reducer";
+import * as client from "./client";
+import type { RootState } from "../../../store";
 
 export default function Assignments() {
   const { cid } = useParams<{ cid: string }>();
+  const router = useRouter();
   const dispatch = useDispatch();
+
   const { assignments } = useSelector(
-    (state: { assignmentsReducer: { assignments: AssignmentFull[] } }) =>
-      state.assignmentsReducer
+    (state: RootState) => state.assignmentsReducer
   );
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
-  const router = useRouter();
 
-  const [assignment, setAssignment] = useState<AssignmentFull>({
+  const [assignment, setAssignment] = useState<Assignment>({
     _id: "",
-    course: cid,
+    course: String(cid),
     title: "",
     description: "",
     points: 100,
@@ -51,20 +50,48 @@ export default function Assignments() {
   });
 
   const [showDelete, setShowDelete] = useState(false);
-  const [toDelete, setToDelete] = useState<AssignmentFull | null>(null);
+  const [toDelete, setToDelete] = useState<Assignment | null>(null);
 
-  const addNewAssignment = () => {
-    dispatch(addAssignment({ ...assignment, course: cid }));
-    setAssignment({
-      _id: "",
-      course: cid,
-      title: "",
-      description: "",
-      points: 100,
-      due: "",
-      availableFrom: "",
-      availableUntil: "",
-    });
+  useEffect(() => {
+    const load = async () => {
+      if (!cid) return;
+      try {
+        const data = await client.fetchAssignmentsForCourse(String(cid));
+        dispatch(setAssignments(data));
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    load();
+  }, [cid, dispatch]);
+
+  const addNewAssignment = async () => {
+    if (!cid) return;
+    try {
+      const created = await client.createAssignmentForCourse(String(cid), {
+        _id: "", 
+        course: String(cid),
+        title: assignment.title,
+        description: assignment.description,
+        points: assignment.points,
+        due: assignment.due,
+        availableFrom: assignment.availableFrom,
+        availableUntil: assignment.availableUntil,
+      });
+      dispatch(setAssignments([...assignments, created]));
+      setAssignment({
+        _id: "",
+        course: String(cid),
+        title: "",
+        description: "",
+        points: 100,
+        due: "",
+        availableFrom: "",
+        availableUntil: "",
+      });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -84,7 +111,11 @@ export default function Assignments() {
           </InputGroup>
         </div>
         <div className="ms-3 flex-shrink-0">
-          <Button variant="secondary" className="me-2 group-btn" id="wd-add-group">
+          <Button
+            variant="secondary"
+            className="me-2 group-btn"
+            id="wd-add-group"
+          >
             + Group
           </Button>
           <Button
@@ -119,9 +150,14 @@ export default function Assignments() {
           </Button>
           <Button
             variant="danger"
-            onClick={() => {
+            onClick={async () => {
               if (toDelete?._id) {
-                dispatch(deleteAssignment(toDelete._id));
+                try {
+                  await client.deleteAssignment(toDelete._id);
+                  dispatch(deleteAssignmentInState(toDelete._id));
+                } catch (e) {
+                  console.error(e);
+                }
               }
               setShowDelete(false);
             }}
@@ -130,7 +166,7 @@ export default function Assignments() {
           </Button>
         </Modal.Footer>
       </Modal>
-
+      
       <ListGroup className="rounded-0 shadow-sm">
         <ListGroupItem className="wd-module p-0 mb-4 fs-5 border-gray">
           <div className="wd-title wd-assn-header px-3 py-3 d-flex justify-content-between align-items-center border-bottom">
@@ -179,7 +215,9 @@ export default function Assignments() {
                       </div>
 
                       {a.description && (
-                        <div className="text-muted small mt-1">{a.description}</div>
+                        <div className="text-muted small mt-1">
+                          {a.description}
+                        </div>
                       )}
                       <div className="text-muted small mt-1">
                         {a.availableFrom && (
