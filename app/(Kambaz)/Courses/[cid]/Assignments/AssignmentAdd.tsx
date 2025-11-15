@@ -11,7 +11,7 @@ export interface Assignment {
   availableUntil?: string;
 }
 
-export interface AssignmentChangeProps<T extends Assignment = Assignment> {
+export interface AssignmentAddProps<T extends Assignment = Assignment> {
   show: boolean;
   handleClose: () => void;
   dialogTitle: string;
@@ -20,14 +20,14 @@ export interface AssignmentChangeProps<T extends Assignment = Assignment> {
   addAssignment: () => void;
 }
 
-export default function AssignmentChange<T extends Assignment>({
+export default function AssignmentAdd<T extends Assignment>({
   show,
   handleClose,
   dialogTitle,
   assignment,
   setAssignment,
   addAssignment,
-}: AssignmentChangeProps<T>) {
+}: AssignmentAddProps<T>) {
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
