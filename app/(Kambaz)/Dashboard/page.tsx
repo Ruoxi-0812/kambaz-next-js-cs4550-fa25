@@ -20,9 +20,9 @@ import {
   enroll as enrollAction,
   unenroll as unenrollAction,
   setEnrollments,
-} from "../Courses/[cid]/Enrollments/reducer";
+} from "../Courses/Enrollments/reducer";
 import * as coursesClient from "../Courses/client";
-import * as enrollmentsClient from "../Enrollments/client";
+import * as enrollmentsClient from "../Courses/Enrollments/client";
 import type { Course } from "../Courses/reducer";
 
 export default function Dashboard() {
@@ -71,12 +71,16 @@ export default function Dashboard() {
     try {
       const [allCourses, myEnrollments] = await Promise.all([
         coursesClient.fetchAllCourses(),
-        enrollmentsClient.fetchMyEnrollments(),
+        // ⭐ 用新的 client 函数名，并传入 currentUser._id
+        enrollmentsClient.getUserEnrollments(currentUser._id),
       ]);
       dispatch(setCourses(allCourses));
       dispatch(
         setEnrollments(
-          myEnrollments.map((e) => ({ user: e.user, course: e.course }))
+          myEnrollments.map((e: { user: string; course: string }) => ({
+            user: e.user,
+            course: e.course,
+          }))
         )
       );
     } catch (e) {
@@ -130,10 +134,12 @@ export default function Dashboard() {
     if (!userId) return;
     try {
       if (isEnrolled(courseId)) {
-        await enrollmentsClient.unenrollFromCourse(courseId);
+        // ⭐ 原来是 unenrollFromCourse(courseId)，现在用新函数名 + userId
+        await enrollmentsClient.unenroll(userId, courseId);
         dispatch(unenrollAction({ user: userId, course: courseId }));
       } else {
-        await enrollmentsClient.enrollInCourse(courseId);
+        // ⭐ 原来是 enrollInCourse(courseId)
+        await enrollmentsClient.enroll(userId, courseId);
         dispatch(enrollAction({ user: userId, course: courseId }));
       }
     } catch (e) {
