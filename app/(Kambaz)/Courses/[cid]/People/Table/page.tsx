@@ -38,6 +38,7 @@ export default function PeopleTable() {
     load();
   }, [cid]);
 
+  // 创建新用户并 enroll 到当前课程
   const handleCreate = async () => {
     if (!cid) return;
     if (!draft.firstName.trim() || !draft.lastName.trim()) return;
@@ -100,6 +101,7 @@ export default function PeopleTable() {
 
   return (
     <div id="wd-people-table">
+      {/* 顶部简单的新增行 */}
       <div className="mb-3 d-flex gap-2 align-items-center">
         <FormControl
           placeholder="First name"
