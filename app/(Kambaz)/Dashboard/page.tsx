@@ -16,14 +16,16 @@ import { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store";
 import { setCourses } from "../Courses/reducer";
+import type { Course } from "../Courses/reducer";
 import {
-  enroll as enrollAction,
-  unenroll as unenrollAction,
-  setEnrollments,
+  enrollCourse,
+  unenrollCourse,
+  clearEnrollments,
+  setUserEnrollments,
+  type Enrollment,
 } from "../Courses/Enrollments/reducer";
 import * as coursesClient from "../Courses/client";
 import * as enrollmentsClient from "../Courses/Enrollments/client";
-import type { Course } from "../Courses/reducer";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -31,12 +33,12 @@ export default function Dashboard() {
   const currentUser = useSelector(
     (s: RootState) => s.accountReducer.currentUser
   ) as { _id: string; role?: string } | null;
-  const enrollments = useSelector(
-    (s: RootState) => s.enrollmentsReducer.enrollments
-  ) as Array<{ user: string; course: string }>;
+
+  const userEnrollments = useSelector(
+    (s: RootState) => s.enrollmentsReducer.userEnrollments
+  ) as Enrollment[];
 
   const userId = currentUser?._id ?? null;
-
   const [enrolling, setEnrolling] = useState(false);
 
   const [course, setCourse] = useState<Course>({
@@ -54,31 +56,36 @@ export default function Dashboard() {
   const isEnrolled = (courseId: string) =>
     !!(
       userId &&
-      enrollments.some((en) => en.user === userId && en.course === courseId)
+      userEnrollments.some(
+        (en) => en.user === userId && en.course === courseId
+      )
     );
 
   const visibleCourses = useMemo(() => {
     if (!userId) return [];
     return enrolling ? courses : courses.filter((c) => isEnrolled(c._id));
-  }, [enrolling, courses, enrollments, userId]);
+  }, [enrolling, courses, userEnrollments, userId]);
 
   const fetchData = async () => {
     if (!currentUser) {
       dispatch(setCourses([]));
-      dispatch(setEnrollments([]));
+      dispatch(clearEnrollments());
       return;
     }
     try {
       const [allCourses, myEnrollments] = await Promise.all([
         coursesClient.fetchAllCourses(),
-        enrollmentsClient.fetchMyEnrollments(),
+        enrollmentsClient.getUserEnrollments(currentUser._id),
       ]);
       dispatch(setCourses(allCourses));
+      // make sure we only keep user & course fields
       dispatch(
-        setEnrollments(
-          myEnrollments.map((e) => ({ user: e.user, course: e.course }))
-        )
-      );
+        setUserEnrollments(
+          (myEnrollments ?? []).map((e: Enrollment) => ({
+            user: e.user,
+            course: e.course,
+          }))
+        ));
     } catch (e) {
       console.error("Failed to load dashboard data:", e);
     }
@@ -86,16 +93,21 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
-  }, [currentUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?._id]);
 
   const onAddNewCourse = async () => {
     if (!currentUser) return;
     try {
       const newCourse = await coursesClient.createCourse(course);
       dispatch(setCourses([...courses, newCourse]));
+
       if (newCourse._id) {
+        // create enrollment on server
+        await enrollmentsClient.enroll(currentUser._id, newCourse._id);
+        // and in Redux
         dispatch(
-          enrollAction({ user: currentUser._id, course: newCourse._id })
+          enrollCourse({ user: currentUser._id, course: newCourse._id })
         );
       }
     } catch (e) {
@@ -130,11 +142,11 @@ export default function Dashboard() {
     if (!userId) return;
     try {
       if (isEnrolled(courseId)) {
-        await enrollmentsClient.unenrollFromCourse(courseId);
-        dispatch(unenrollAction({ user: userId, course: courseId }));
+        await enrollmentsClient.unenroll(userId, courseId);
+        dispatch(unenrollCourse({ user: userId, course: courseId }));
       } else {
-        await enrollmentsClient.enrollInCourse(courseId);
-        dispatch(enrollAction({ user: userId, course: courseId }));
+        await enrollmentsClient.enroll(userId, courseId);
+        dispatch(enrollCourse({ user: userId, course: courseId }));
       }
     } catch (e) {
       console.error(e);

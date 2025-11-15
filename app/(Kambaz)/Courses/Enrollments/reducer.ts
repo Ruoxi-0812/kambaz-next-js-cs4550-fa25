@@ -1,54 +1,55 @@
-"use client";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export type Enrollment = { user: string; course: string };
-
-interface EnrollmentsState {
-  enrollments: Enrollment[];
+export interface Enrollment {
+  user: string;
+  course: string;
 }
 
-const initialState: EnrollmentsState = {
-  enrollments: [],
+interface EnrollmentState {
+  userEnrollments: Enrollment[];
+}
+
+const initialState: EnrollmentState = {
+  userEnrollments: [],
 };
 
 const enrollmentsSlice = createSlice({
-  name: "enrollments",
+  name: "enrollmentsReducer",
   initialState,
   reducers: {
-    setEnrollments(state, action: PayloadAction<Enrollment[]>) {
-      state.enrollments = action.payload;
-    },
-    enroll(state, action: PayloadAction<Enrollment>) {
+    enrollCourse: (state, action: PayloadAction<Enrollment>) => {
       const { user, course } = action.payload;
-      const exists = state.enrollments.some(
+      const already = state.userEnrollments.some(
         (e) => e.user === user && e.course === course
       );
-      if (!exists) {
-        state.enrollments.push({ user, course });
+      if (!already) {
+        state.userEnrollments.push({ user, course });
       }
     },
-    unenroll(state, action: PayloadAction<Enrollment>) {
+
+    unenrollCourse: (state, action: PayloadAction<Enrollment>) => {
       const { user, course } = action.payload;
-      state.enrollments = state.enrollments.filter(
+      state.userEnrollments = state.userEnrollments.filter(
         (e) => !(e.user === user && e.course === course)
       );
+      state.userEnrollments = [...state.userEnrollments];
     },
-    toggle(state, action: PayloadAction<Enrollment>) {
-      const { user, course } = action.payload;
-      const exists = state.enrollments.some(
-        (e) => e.user === user && e.course === course
-      );
-      if (exists) {
-        state.enrollments = state.enrollments.filter(
-          (e) => !(e.user === user && e.course === course)
-        );
-      } else {
-        state.enrollments.push({ user, course });
-      }
+
+    clearEnrollments: (state) => {
+      state.userEnrollments = [];
+    },
+
+    setUserEnrollments: (state, action: PayloadAction<Enrollment[]>) => {
+      state.userEnrollments = action.payload ?? [];
     },
   },
 });
 
-export const { setEnrollments, enroll, unenroll, toggle } =
-  enrollmentsSlice.actions;
+export const {
+  enrollCourse,
+  unenrollCourse,
+  clearEnrollments,
+  setUserEnrollments,
+} = enrollmentsSlice.actions;
+
 export default enrollmentsSlice.reducer;
