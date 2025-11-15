@@ -29,11 +29,16 @@ import * as enrollmentsClient from "../Courses/Enrollments/client";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
+
+  // courses slice
   const { courses } = useSelector((s: RootState) => s.coursesReducer);
+
+  // current user from account slice
   const currentUser = useSelector(
     (s: RootState) => s.accountReducer.currentUser
   ) as { _id: string; role?: string } | null;
 
+  // enrollments slice
   const userEnrollments = useSelector(
     (s: RootState) => s.enrollmentsReducer.userEnrollments
   ) as Enrollment[];
@@ -77,15 +82,18 @@ export default function Dashboard() {
         coursesClient.fetchAllCourses(),
         enrollmentsClient.getUserEnrollments(currentUser._id),
       ]);
+
       dispatch(setCourses(allCourses));
-      // make sure we only keep user & course fields
+
+      // 只保留 user 和 course 字段
       dispatch(
         setUserEnrollments(
           (myEnrollments ?? []).map((e: Enrollment) => ({
             user: e.user,
             course: e.course,
           }))
-        ));
+        )
+      );
     } catch (e) {
       console.error("Failed to load dashboard data:", e);
     }
@@ -96,6 +104,18 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?._id]);
 
+  const resetCourseForm = () => {
+    setCourse({
+      _id: "0",
+      name: "New Course",
+      number: "New Number",
+      startDate: "2023-09-10",
+      endDate: "2023-12-15",
+      image: "/images/newcourse.jpg",
+      description: "New Description",
+    });
+  };
+
   const onAddNewCourse = async () => {
     if (!currentUser) return;
     try {
@@ -103,13 +123,13 @@ export default function Dashboard() {
       dispatch(setCourses([...courses, newCourse]));
 
       if (newCourse._id) {
-        // create enrollment on server
         await enrollmentsClient.enroll(currentUser._id, newCourse._id);
-        // and in Redux
         dispatch(
           enrollCourse({ user: currentUser._id, course: newCourse._id })
         );
       }
+
+      resetCourseForm();
     } catch (e) {
       console.error(e);
     }
@@ -118,12 +138,17 @@ export default function Dashboard() {
   const onUpdateCourse = async () => {
     if (!course._id) return;
     try {
+      // ⭐ 用旧的 id 去匹配，避免后端修改 _id 导致匹配失败
+      const originalId = course._id;
       const updated = await coursesClient.updateCourse(course);
+
       dispatch(
         setCourses(
-          courses.map((c) => (c._id === updated._id ? updated : c))
+          courses.map((c) => (c._id === originalId ? updated : c))
         )
       );
+
+      resetCourseForm();
     } catch (e) {
       console.error(e);
     }
