@@ -1,28 +1,34 @@
 import axios from "axios";
 
-const SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER || "http://localhost:4000";
-const ENROLLMENTS_API = `${SERVER}/api`;
+const axiosWithCredentials = axios.create({ withCredentials: true });
 
-export const getUserEnrollments = async (uid: string) => {
-  const response = await axios.get(`${ENROLLMENTS_API}/users/${uid}/enrollments`, {
-    withCredentials: true,
-  });
-  return response.data;
+const HTTP_SERVER =
+  process.env.NEXT_PUBLIC_HTTP_SERVER || "http://localhost:4000";
+const USERS_API = `${HTTP_SERVER}/api/users`;
+
+export type Enrollment = {
+  _id: string;
+  user: string;
+  course: string;
 };
 
-export const enroll = async (user: string, course: string) => {
-  const response = await axios.post(
-    `${ENROLLMENTS_API}/enrollments`,
-    { user, course },
-    { withCredentials: true }
+export const fetchMyEnrollments = async () => {
+  const { data } = await axiosWithCredentials.get<Enrollment[]>(
+    `${USERS_API}/current/enrollments`
   );
-  return response.data;
+  return data;
 };
 
-export const unenroll = async (user: string, course: string) => {
-  const response = await axios.delete(
-    `${ENROLLMENTS_API}/users/${user}/enrollments/${course}`,
-    { withCredentials: true }
+export const enrollInCourse = async (courseId: string) => {
+  const { data } = await axiosWithCredentials.post<Enrollment>(
+    `${USERS_API}/current/courses/${courseId}/enroll`
   );
-  return response.data;
+  return data;
+};
+
+export const unenrollFromCourse = async (courseId: string) => {
+  const { data } = await axiosWithCredentials.delete(
+    `${USERS_API}/current/courses/${courseId}/enroll`
+  );
+  return data;
 };
