@@ -85,7 +85,6 @@ export default function Dashboard() {
 
       dispatch(setCourses(allCourses));
 
-      // 只保留 user 和 course 字段
       dispatch(
         setUserEnrollments(
           (myEnrollments ?? []).map((e: Enrollment) => ({
@@ -118,27 +117,35 @@ export default function Dashboard() {
 
   const onAddNewCourse = async () => {
     if (!currentUser) return;
+  
     try {
-      const newCourse = await coursesClient.createCourse(course);
+      const newCourse = await coursesClient.createCourse({
+        name: course.name,
+        number: course.number,
+        description: course.description,
+        image: course.image,
+      });
+
       dispatch(setCourses([...courses, newCourse]));
 
       if (newCourse._id) {
-        await enrollmentsClient.enroll(currentUser._id, newCourse._id);
         dispatch(
           enrollCourse({ user: currentUser._id, course: newCourse._id })
         );
       }
 
+      await fetchData();
+
       resetCourseForm();
     } catch (e) {
-      console.error(e);
+      console.error("Failed to add new course:", e);
     }
   };
+  
 
   const onUpdateCourse = async () => {
     if (!course._id) return;
     try {
-      // ⭐ 用旧的 id 去匹配，避免后端修改 _id 导致匹配失败
       const originalId = course._id;
       const updated = await coursesClient.updateCourse(course);
 
