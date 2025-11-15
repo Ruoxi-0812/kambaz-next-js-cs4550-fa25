@@ -1,5 +1,4 @@
-"use client";
-
+"use client"
 import { Modal, FormControl, Button } from "react-bootstrap";
 export default function ModuleEditor({ show, handleClose, dialogTitle, moduleName, setModuleName, addModule,}: {
  show: boolean; handleClose: () => void; dialogTitle: string; moduleName: string; setModuleName: (name: string) => void;
@@ -15,7 +14,7 @@ export default function ModuleEditor({ show, handleClose, dialogTitle, moduleNam
    </Modal.Body>
    <Modal.Footer>
     <Button variant="secondary" onClick={handleClose}> Cancel </Button>
-    <Button variant="danger"
+    <Button variant="primary"
      onClick={() => {
       addModule();
       handleClose();

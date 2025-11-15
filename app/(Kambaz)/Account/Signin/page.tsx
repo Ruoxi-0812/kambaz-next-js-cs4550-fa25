@@ -16,8 +16,8 @@ interface User {
 
 export default function Signin() {
   const [credentials, setCredentials] = useState<User>({
-    username: "ruoxi",
-    password: "123456",
+    username: "wurui2",
+    password: "123",
   });
   const dispatch = useDispatch();
   const router = useRouter();

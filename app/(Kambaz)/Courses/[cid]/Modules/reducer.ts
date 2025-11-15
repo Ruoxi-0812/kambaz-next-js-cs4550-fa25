@@ -1,17 +1,18 @@
 "use client";
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { v4 as uuidv4 } from "uuid";
 
-export interface Lesson {
+interface Lesson {
   _id: string;
   name: string;
 }
 
-export interface Module {
+interface Module {
   _id: string;
   name: string;
   course: string;
-  lessons: Lesson[];
+  lessons?: Lesson[];
   editing?: boolean;
 }
 
@@ -27,32 +28,39 @@ const modulesSlice = createSlice({
   name: "modules",
   initialState,
   reducers: {
-    setModules: (state, action: PayloadAction<Module[]>) => {
-      state.modules = action.payload;
+    setModules: (state, { payload }: PayloadAction<Module[]>) => {
+      state.modules = payload;
     },
 
-    addModule: (state, action: PayloadAction<Module>) => {
-      state.modules.push(action.payload);
+    addModule: (state, { payload }) => {
+      const newModule: Module = {
+        _id: uuidv4(),
+        name: payload.name,
+        course: payload.course,
+        lessons: [],
+      };
+      state.modules.push(newModule);
     },
 
-    deleteModule: (state, action: PayloadAction<string>) => {
-      state.modules = state.modules.filter((m) => m._id !== action.payload);
+    deleteModule: (state, { payload }: PayloadAction<string>) => {
+      state.modules = state.modules.filter((m) => m._id !== payload);
     },
 
-    updateModule: (state, action: PayloadAction<Module>) => {
+    updateModule: (state, { payload }) => {
       state.modules = state.modules.map((m) =>
-        m._id === action.payload._id ? action.payload : m
+        m._id === payload._id ? { ...m, ...payload } : m
       );
     },
-    
-    editModule: (state, action: PayloadAction<string>) => {
+
+    editModule: (state, { payload }: PayloadAction<string>) => {
       state.modules = state.modules.map((m) =>
-        m._id === action.payload ? { ...m, editing: true } : { ...m, editing: false }
+        m._id === payload ? { ...m, editing: true } : m
       );
     },
   },
 });
 
-export const { setModules, addModule, deleteModule, updateModule, editModule } =
+export const { addModule, deleteModule, updateModule, editModule, setModules } =
   modulesSlice.actions;
+
 export default modulesSlice.reducer;

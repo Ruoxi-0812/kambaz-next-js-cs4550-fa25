@@ -3,23 +3,37 @@
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
-import { setAssignments } from "../reducer";
+import { addAssignment, updateAssignment } from "../reducer";
 import { useState, useEffect } from "react";
-import * as client from "../client";
 
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
-import CardBody from "react-bootstrap/CardBody";
-import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import FormGroup from "react-bootstrap/FormGroup";
 import FormLabel from "react-bootstrap/FormLabel";
 import FormControl from "react-bootstrap/FormControl";
 import FormCheck from "react-bootstrap/FormCheck";
 import FormSelect from "react-bootstrap/FormSelect";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Card from "react-bootstrap/Card";
+import CardBody from "react-bootstrap/CardBody";
+import Button from "react-bootstrap/Button";
+import * as client from "../client";
 
-import type { Assignment } from "../reducer";
+interface Assignment {
+  _id: string;
+  course: string;
+  title: string;
+  description: string;
+  points: number;
+  group: string;
+  displayGradeAs: string;
+  submissionType: string;
+  onlineEntryOptions?: string[];
+  assignTo?: string;
+  due?: string;
+  availableFrom?: string;
+  availableUntil?: string;
+}
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams<{ cid: string; aid: string }>();
@@ -41,7 +55,7 @@ export default function AssignmentEditor() {
     isNew
       ? {
           _id: "",
-          course: String(cid),
+          course: cid,
           title: "",
           description: "",
           points: 100,
@@ -54,41 +68,14 @@ export default function AssignmentEditor() {
           availableFrom: "",
           availableUntil: "",
         }
-      : {
-          ...(original || {
-            _id: "",
-            course: String(cid),
-            title: "",
-            description: "",
-            points: 100,
-            group: "ASSIGNMENTS",
-            displayGradeAs: "Points",
-            submissionType: "Online",
-            onlineEntryOptions: [],
-            assignTo: "",
-            due: "",
-            availableFrom: "",
-            availableUntil: "",
-          }),
-        }
+      : { ...(original || ({} as Assignment)) }
   );
 
   useEffect(() => {
-    if (isNew) return;
-    const load = async () => {
-      try {
-        const serverAssignment = await client.fetchAssignmentById(String(aid));
-        if (!serverAssignment || serverAssignment.course !== cid) {
-          router.push(`/Courses/${cid}/Assignments`);
-          return;
-        }
-        setAssignment(serverAssignment);
-      } catch {
-        router.push(`/Courses/${cid}/Assignments`);
-      }
-    };
-    load();
-  }, [isNew, aid, cid, router]);
+    if (!isNew && !original) {
+      router.push(`/Courses/${cid}/Assignments`);
+    }
+  }, [isNew, original, cid, router]);
 
   const handleCheckbox = (option: string) => {
     const current = assignment.onlineEntryOptions || [];
@@ -101,28 +88,14 @@ export default function AssignmentEditor() {
   };
 
   const handleSave = async () => {
-    try {
-      let saved: Assignment;
-
-      if (isNew) {
-        saved = await client.createAssignmentForCourse(String(cid), {
-          ...assignment,
-          _id: "", 
-        });
-        const next = [...assignments, saved];
-        dispatch(setAssignments(next));
-      } else {
-        saved = await client.updateAssignment(assignment);
-        const next = assignments.map((a) =>
-          a._id === saved._id ? saved : a
-        );
-        dispatch(setAssignments(next));
-      }
-
-      router.push(`/Courses/${cid}/Assignments`);
-    } catch (e) {
-      console.error(e);
+    if (isNew) {
+      const created = await client.createAssignmentForCourse(cid, assignment);
+      dispatch(addAssignment(created));
+    } else {
+      const updated = await client.updateAssignment(assignment);
+      dispatch(updateAssignment(updated));
     }
+    router.push(`/Courses/${cid}/Assignments`);
   };
 
   return (
@@ -175,7 +148,7 @@ export default function AssignmentEditor() {
           </FormLabel>
           <Col sm={4}>
             <FormSelect
-              value={assignment.group || "ASSIGNMENTS"}
+              value={assignment.group}
               onChange={(e) =>
                 setAssignment({ ...assignment, group: e.target.value })
               }
@@ -195,7 +168,7 @@ export default function AssignmentEditor() {
           </FormLabel>
           <Col sm={4}>
             <FormSelect
-              value={assignment.displayGradeAs || "Points"}
+              value={assignment.displayGradeAs}
               onChange={(e) =>
                 setAssignment({
                   ...assignment,
@@ -216,7 +189,7 @@ export default function AssignmentEditor() {
             <FormGroup className="mb-3" controlId="wd-submission-type">
               <FormLabel>Submission Type</FormLabel>
               <FormSelect
-                value={assignment.submissionType || "Online"}
+                value={assignment.submissionType}
                 onChange={(e) =>
                   setAssignment({
                     ...assignment,
@@ -261,7 +234,7 @@ export default function AssignmentEditor() {
               <FormLabel>Assign to</FormLabel>
               <FormControl
                 type="text"
-                value={assignment.assignTo || ""}
+                value={assignment.assignTo}
                 onChange={(e) =>
                   setAssignment({ ...assignment, assignTo: e.target.value })
                 }
@@ -318,7 +291,7 @@ export default function AssignmentEditor() {
           </CardBody>
         </Card>
 
-        <div className="mt-4 d-flex justify-content-end">
+        <div className="mt-4">
           <Link
             href={`/Courses/${cid}/Assignments`}
             className="btn btn-secondary me-2"
