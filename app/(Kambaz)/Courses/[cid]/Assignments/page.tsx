@@ -35,6 +35,13 @@ export default function Assignments() {
     (state: RootState) => state.assignmentsReducer
   );
 
+  const currentUser = useSelector(
+    (state: RootState) => state.accountReducer.currentUser
+  ) as { _id: string; role?: string } | null;
+
+  const role = currentUser?.role;
+  const isFaculty = role === "FACULTY" || role === "ADMIN";
+
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
 
@@ -66,10 +73,10 @@ export default function Assignments() {
   }, [cid, dispatch]);
 
   const addNewAssignment = async () => {
-    if (!cid) return;
+    if (!cid || !isFaculty) return;
     try {
       const created = await client.createAssignmentForCourse(String(cid), {
-        _id: "", 
+        _id: "",
         course: String(cid),
         title: assignment.title,
         description: assignment.description,
@@ -111,20 +118,26 @@ export default function Assignments() {
           </InputGroup>
         </div>
         <div className="ms-3 flex-shrink-0">
-          <Button
-            variant="secondary"
-            className="me-2 group-btn"
-            id="wd-add-group"
-          >
-            + Group
-          </Button>
-          <Button
-            variant="danger"
-            id="wd-add-assignment"
-            onClick={() => router.push(`/Courses/${cid}/Assignments/new`)}
-          >
-            + Assignment
-          </Button>
+          {isFaculty && (
+            <>
+              <Button
+                variant="secondary"
+                className="me-2 group-btn"
+                id="wd-add-group"
+              >
+                + Group
+              </Button>
+              <Button
+                variant="danger"
+                id="wd-add-assignment"
+                onClick={() =>
+                  router.push(`/Courses/${cid}/Assignments/new`)
+                }
+              >
+                + Assignment
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -151,7 +164,7 @@ export default function Assignments() {
           <Button
             variant="danger"
             onClick={async () => {
-              if (toDelete?._id) {
+              if (toDelete?._id && isFaculty) {
                 try {
                   await client.deleteAssignment(toDelete._id);
                   dispatch(deleteAssignmentInState(toDelete._id));
@@ -166,7 +179,7 @@ export default function Assignments() {
           </Button>
         </Modal.Footer>
       </Modal>
-      
+
       <ListGroup className="rounded-0 shadow-sm">
         <ListGroupItem className="wd-module p-0 mb-4 fs-5 border-gray">
           <div className="wd-title wd-assn-header px-3 py-3 d-flex justify-content-between align-items-center border-bottom">
@@ -201,16 +214,20 @@ export default function Assignments() {
                         </Link>
 
                         <div className="ms-2 d-flex align-items-center">
-                          <AssignmentControlButtons
-                            assignmentId={a._id}
-                            deleteAssignment={() => {
-                              setToDelete(a);
-                              setShowDelete(true);
-                            }}
-                            onEdit={(id) =>
-                              router.push(`/Courses/${cid}/Assignments/${id}`)
-                            }
-                          />
+                          {isFaculty && (
+                            <AssignmentControlButtons
+                              assignmentId={a._id}
+                              deleteAssignment={() => {
+                                setToDelete(a);
+                                setShowDelete(true);
+                              }}
+                              onEdit={(id) =>
+                                router.push(
+                                  `/Courses/${cid}/Assignments/${id}`
+                                )
+                              }
+                            />
+                          )}
                         </div>
                       </div>
 

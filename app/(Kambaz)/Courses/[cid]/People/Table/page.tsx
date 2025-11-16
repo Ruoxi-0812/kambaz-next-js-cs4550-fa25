@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Table, Button, FormControl } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
 import { useParams } from "next/navigation";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../../store";
 import type { User } from "../../../../Users/client";
 import {
   fetchPeopleForCourse,
@@ -14,6 +16,13 @@ import {
 
 export default function PeopleTable() {
   const { cid } = useParams<{ cid: string }>();
+  const currentUser = useSelector(
+    (state: RootState) => state.accountReducer.currentUser
+  ) as { _id: string; role?: string } | null;
+
+  const role = currentUser?.role;
+  const isFaculty = role === "FACULTY" || role === "ADMIN";
+
   const [people, setPeople] = useState<User[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<User>({
@@ -38,9 +47,8 @@ export default function PeopleTable() {
     load();
   }, [cid]);
 
-  // 创建新用户并 enroll 到当前课程
   const handleCreate = async () => {
-    if (!cid) return;
+    if (!cid || !isFaculty) return;
     if (!draft.firstName.trim() || !draft.lastName.trim()) return;
     const created = await createUserForCourse(String(cid), {
       firstName: draft.firstName.trim(),
@@ -64,6 +72,7 @@ export default function PeopleTable() {
   };
 
   const startEdit = (user: User) => {
+    if (!isFaculty) return;
     setEditingId(user._id!);
     setDraft(user);
   };
@@ -82,7 +91,7 @@ export default function PeopleTable() {
   };
 
   const saveEdit = async () => {
-    if (!cid || !draft._id) return;
+    if (!cid || !draft._id || !isFaculty) return;
     const updated = await updateUserInCourse(String(cid), draft);
     const next = people.map((u) => (u._id === updated._id ? updated : u));
     setPeople(next);
@@ -90,7 +99,7 @@ export default function PeopleTable() {
   };
 
   const handleDelete = async (userId: string) => {
-    if (!cid) return;
+    if (!cid || !isFaculty) return;
     await deleteUserFromCourse(String(cid), userId);
     setPeople(people.filter((u) => u._id !== userId));
   };
@@ -101,53 +110,54 @@ export default function PeopleTable() {
 
   return (
     <div id="wd-people-table">
-      {/* 顶部简单的新增行 */}
-      <div className="mb-3 d-flex gap-2 align-items-center">
-        <FormControl
-          placeholder="First name"
-          style={{ maxWidth: 140 }}
-          value={draft.firstName}
-          onChange={(e) => handleDraftChange("firstName", e.target.value)}
-        />
-        <FormControl
-          placeholder="Last name"
-          style={{ maxWidth: 140 }}
-          value={draft.lastName}
-          onChange={(e) => handleDraftChange("lastName", e.target.value)}
-        />
-        <FormControl
-          placeholder="Login ID"
-          style={{ maxWidth: 160 }}
-          value={draft.loginId}
-          onChange={(e) => handleDraftChange("loginId", e.target.value)}
-        />
-        <FormControl
-          placeholder="Section"
-          style={{ maxWidth: 100 }}
-          value={draft.section}
-          onChange={(e) => handleDraftChange("section", e.target.value)}
-        />
-        <FormControl
-          placeholder="Role"
-          style={{ maxWidth: 120 }}
-          value={draft.role}
-          onChange={(e) => handleDraftChange("role", e.target.value)}
-        />
-        {editingId ? (
-          <>
-            <Button variant="success" size="sm" onClick={saveEdit}>
-              Save
+      {isFaculty && (
+        <div className="mb-3 d-flex gap-2 align-items-center">
+          <FormControl
+            placeholder="First name"
+            style={{ maxWidth: 140 }}
+            value={draft.firstName}
+            onChange={(e) => handleDraftChange("firstName", e.target.value)}
+          />
+          <FormControl
+            placeholder="Last name"
+            style={{ maxWidth: 140 }}
+            value={draft.lastName}
+            onChange={(e) => handleDraftChange("lastName", e.target.value)}
+          />
+          <FormControl
+            placeholder="Login ID"
+            style={{ maxWidth: 160 }}
+            value={draft.loginId}
+            onChange={(e) => handleDraftChange("loginId", e.target.value)}
+          />
+          <FormControl
+            placeholder="Section"
+            style={{ maxWidth: 100 }}
+            value={draft.section}
+            onChange={(e) => handleDraftChange("section", e.target.value)}
+          />
+          <FormControl
+            placeholder="Role"
+            style={{ maxWidth: 120 }}
+            value={draft.role}
+            onChange={(e) => handleDraftChange("role", e.target.value)}
+          />
+          {editingId ? (
+            <>
+              <Button variant="success" size="sm" onClick={saveEdit}>
+                Save
+              </Button>
+              <Button variant="secondary" size="sm" onClick={cancelEdit}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button variant="primary" size="sm" onClick={handleCreate}>
+              Add User
             </Button>
-            <Button variant="secondary" size="sm" onClick={cancelEdit}>
-              Cancel
-            </Button>
-          </>
-        ) : (
-          <Button variant="primary" size="sm" onClick={handleCreate}>
-            Add User
-          </Button>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       <Table striped>
         <thead>
@@ -253,7 +263,7 @@ export default function PeopleTable() {
                   )}
                 </td>
                 <td className="text-nowrap">
-                  {editing ? null : (
+                  {isFaculty && !editing && (
                     <>
                       <Button
                         variant="outline-secondary"
@@ -266,9 +276,7 @@ export default function PeopleTable() {
                       <Button
                         variant="outline-danger"
                         size="sm"
-                        onClick={() =>
-                          user._id && handleDelete(user._id)
-                        }
+                        onClick={() => user._id && handleDelete(user._id)}
                       >
                         Delete
                       </Button>

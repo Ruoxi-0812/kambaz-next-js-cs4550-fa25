@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setAssignments } from "../reducer";
 import { useState, useEffect } from "react";
 import * as client from "../client";
+import type { RootState } from "../../../../store";
 
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -30,6 +31,13 @@ export default function AssignmentEditor() {
     (state: { assignmentsReducer: { assignments: Assignment[] } }) =>
       state.assignmentsReducer
   );
+
+  const currentUser = useSelector(
+    (state: RootState) => state.accountReducer.currentUser
+  ) as { _id: string; role?: string } | null;
+
+  const role = currentUser?.role;
+  const isFaculty = role === "FACULTY" || role === "ADMIN";
 
   const isNew = aid === "new";
 
@@ -101,13 +109,14 @@ export default function AssignmentEditor() {
   };
 
   const handleSave = async () => {
+    if (!isFaculty) return;
     try {
       let saved: Assignment;
 
       if (isNew) {
         saved = await client.createAssignmentForCourse(String(cid), {
           ...assignment,
-          _id: "", 
+          _id: "",
         });
         const next = [...assignments, saved];
         dispatch(setAssignments(next));
@@ -325,7 +334,7 @@ export default function AssignmentEditor() {
           >
             Cancel
           </Link>
-          <Button variant="danger" onClick={handleSave}>
+          <Button variant="danger" onClick={handleSave} disabled={!isFaculty}>
             Save
           </Button>
         </div>

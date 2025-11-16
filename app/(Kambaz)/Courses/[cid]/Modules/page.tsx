@@ -13,6 +13,7 @@ import LessonControlButtons from "./LessonControlButtons";
 import { setModules, editModule, updateModule, deleteModule } from "./reducer";
 
 import * as client from "../../client";
+import type { RootState } from "../../../store";
 
 interface Lesson {
   _id: string;
@@ -27,14 +28,18 @@ interface Module {
   editing?: boolean;
 }
 
-interface RootState {
-  modulesReducer: { modules: Module[] };
-}
-
 export default function Modules() {
   const { cid } = useParams<{ cid: string }>();
   const dispatch = useDispatch();
   const { modules } = useSelector((state: RootState) => state.modulesReducer);
+
+  const currentUser = useSelector(
+    (state: RootState) => state.accountReducer.currentUser
+  ) as { _id: string; role?: string } | null;
+
+  const role = currentUser?.role;
+  const isFaculty = role === "FACULTY" || role === "ADMIN";
+
   const [moduleName, setModuleName] = useState("");
 
   const fetchModules = async () => {
@@ -48,7 +53,7 @@ export default function Modules() {
   }, [cid]);
 
   const onCreateModuleForCourse = async () => {
-    if (!cid || !moduleName.trim()) return;
+    if (!cid || !moduleName.trim() || !isFaculty) return;
     const newModule = { name: moduleName };
     const created = await client.createModuleForCourse(cid, newModule);
     dispatch(setModules([...modules, created]));
@@ -56,6 +61,7 @@ export default function Modules() {
   };
 
   const onUpdateModule = async (module: Module) => {
+    if (!isFaculty) return;
     await client.updateModule(module);
     const updatedModules = modules.map((m: Module) =>
       m._id === module._id ? module : m
@@ -64,17 +70,20 @@ export default function Modules() {
   };
 
   const onRemoveModule = async (moduleId: string) => {
+    if (!isFaculty) return;
     await client.deleteModule(moduleId);
     dispatch(deleteModule(moduleId));
   };
 
   return (
     <div>
-      <ModulesControls
-        moduleName={moduleName}
-        setModuleName={setModuleName}
-        addModule={onCreateModuleForCourse}
-      />
+      {isFaculty && (
+        <ModulesControls
+          moduleName={moduleName}
+          setModuleName={setModuleName}
+          addModule={onCreateModuleForCourse}
+        />
+      )}
 
       <br />
       <br />
@@ -92,7 +101,7 @@ export default function Modules() {
 
               {!module.editing && module.name}
 
-              {module.editing && (
+              {module.editing && isFaculty && (
                 <FormControl
                   className="w-50 d-inline-block"
                   value={module.name}
@@ -107,11 +116,13 @@ export default function Modules() {
                 />
               )}
 
-              <ModuleControlButtons
-                moduleId={module._id}
-                deleteModule={onRemoveModule}
-                editModule={(moduleId) => dispatch(editModule(moduleId))}
-              />
+              {isFaculty && (
+                <ModuleControlButtons
+                  moduleId={module._id}
+                  deleteModule={onRemoveModule}
+                  editModule={(moduleId) => dispatch(editModule(moduleId))}
+                />
+              )}
             </div>
 
             {module.lessons && (

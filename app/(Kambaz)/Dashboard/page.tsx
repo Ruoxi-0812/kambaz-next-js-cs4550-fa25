@@ -30,15 +30,16 @@ import * as enrollmentsClient from "../Courses/Enrollments/client";
 export default function Dashboard() {
   const dispatch = useDispatch();
 
-  // courses slice
   const { courses } = useSelector((s: RootState) => s.coursesReducer);
 
-  // current user from account slice
   const currentUser = useSelector(
     (s: RootState) => s.accountReducer.currentUser
   ) as { _id: string; role?: string } | null;
 
-  // enrollments slice
+  const role = currentUser?.role;
+  const isFaculty = role === "FACULTY" || role === "ADMIN";
+  const isStudent = role === "STUDENT" || role === "USER";
+
   const userEnrollments = useSelector(
     (s: RootState) => s.enrollmentsReducer.userEnrollments
   ) as Enrollment[];
@@ -116,7 +117,7 @@ export default function Dashboard() {
   };
 
   const onAddNewCourse = async () => {
-    if (!currentUser) return;
+    if (!currentUser || !isFaculty) return;
 
     try {
       const newCourse = await coursesClient.createCourse({
@@ -139,9 +140,9 @@ export default function Dashboard() {
       console.error("Failed to add new course:", e);
     }
   };
-  
+
   const onUpdateCourse = async () => {
-    if (!course._id) return;
+    if (!course._id || !currentUser || !isFaculty) return;
     try {
       const originalId = course._id;
       const updated = await coursesClient.updateCourse(course);
@@ -159,6 +160,7 @@ export default function Dashboard() {
   };
 
   const onDeleteCourse = async (courseId: string) => {
+    if (!currentUser || !isFaculty) return;
     try {
       await coursesClient.deleteCourse(courseId);
       dispatch(setCourses(courses.filter((c) => c._id !== courseId)));
@@ -168,7 +170,7 @@ export default function Dashboard() {
   };
 
   const toggleEnroll = async (courseId: string) => {
-    if (!userId) return;
+    if (!userId || !isStudent) return;
     try {
       if (isEnrolled(courseId)) {
         await enrollmentsClient.unenroll(userId, courseId);
@@ -181,6 +183,8 @@ export default function Dashboard() {
       console.error(e);
     }
   };
+
+  const canToggleEnroll = !!currentUser;
 
   return (
     <div id="wd-dashboard" className="p-4">
@@ -200,8 +204,7 @@ export default function Dashboard() {
       </div>
 
       <hr />
-
-      {currentUser && (
+      {currentUser && isFaculty && (
         <>
           <h5 className="mb-2">
             New Course
@@ -272,7 +275,7 @@ export default function Dashboard() {
                 style={{ width: "300px" }}
               >
                 <Card className="position-relative">
-                  {enrolling && (
+                  {enrolling && canToggleEnroll && (
                     <Button
                       size="sm"
                       variant={enrolled ? "danger" : "success"}
@@ -320,26 +323,30 @@ export default function Dashboard() {
                         </Button>
 
                         <div className="d-flex gap-2">
-                          <Button
-                            id={`wd-edit-course-click-${c._id}`}
-                            className="btn btn-warning px-3"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              startEdit(c);
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            id={`wd-delete-course-click-${c._id}`}
-                            className="btn btn-danger px-3"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              onDeleteCourse(c._id);
-                            }}
-                          >
-                            Delete
-                          </Button>
+                          {isFaculty && (
+                            <>
+                              <Button
+                                id={`wd-edit-course-click-${c._id}`}
+                                className="btn btn-warning px-3"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  startEdit(c);
+                                }}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                id={`wd-delete-course-click-${c._id}`}
+                                className="btn btn-danger px-3"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  onDeleteCourse(c._id);
+                                }}
+                              >
+                                Delete
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </div>
                     </CardBody>
