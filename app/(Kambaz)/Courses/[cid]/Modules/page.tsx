@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ListGroup, ListGroupItem, FormControl } from "react-bootstrap";
+import { ListGroup, ListGroupItem, FormControl, Button } from "react-bootstrap";
 import { BsGripVertical } from "react-icons/bs";
 import { useParams } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
@@ -11,9 +11,7 @@ import ModuleControlButtons from "./ModulesControlButtons";
 import LessonControlButtons from "./LessonControlButtons";
 
 import { setModules, editModule, updateModule, deleteModule } from "./reducer";
-
 import * as client from "../../client";
-import type { RootState } from "../../../store";
 
 interface Lesson {
   _id: string;
@@ -28,14 +26,24 @@ interface Module {
   editing?: boolean;
 }
 
+interface AccountUser {
+  _id: string;
+  role?: string;
+}
+
+interface RootState {
+  modulesReducer: { modules: Module[] };
+  accountReducer: { currentUser: AccountUser | null };
+}
+
 export default function Modules() {
   const { cid } = useParams<{ cid: string }>();
   const dispatch = useDispatch();
-  const { modules } = useSelector((state: RootState) => state.modulesReducer);
 
+  const { modules } = useSelector((state: RootState) => state.modulesReducer);
   const currentUser = useSelector(
     (state: RootState) => state.accountReducer.currentUser
-  ) as { _id: string; role?: string } | null;
+  );
 
   const role = currentUser?.role;
   const isFaculty = role === "FACULTY" || role === "ADMIN";
@@ -77,15 +85,25 @@ export default function Modules() {
 
   return (
     <div>
-      {isFaculty && (
+      {isFaculty ? (
         <ModulesControls
           moduleName={moduleName}
           setModuleName={setModuleName}
           addModule={onCreateModuleForCourse}
         />
+      ) : (
+        <div id="wd-modules-controls" className="text-nowrap mb-3">
+          <Button
+            variant="secondary"
+            size="lg"
+            className="me-2 float-end"
+            id="wd-collapse-all"
+          >
+            Collapse All
+          </Button>
+        </div>
       )}
 
-      <br />
       <br />
       <br />
       <br />
@@ -134,7 +152,7 @@ export default function Modules() {
                   >
                     <BsGripVertical className="me-2 fs-3" />
                     {lesson.name}
-                    <LessonControlButtons />
+                    {isFaculty && <LessonControlButtons />}
                   </ListGroupItem>
                 ))}
               </ListGroup>
