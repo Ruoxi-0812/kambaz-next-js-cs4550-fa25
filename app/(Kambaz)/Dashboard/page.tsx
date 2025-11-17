@@ -184,7 +184,7 @@ export default function Dashboard() {
     }
   };
 
-  const canToggleEnroll = !!currentUser;
+  const canToggleEnroll = !!currentUser && isStudent;
 
   return (
     <div id="wd-dashboard" className="p-4">
