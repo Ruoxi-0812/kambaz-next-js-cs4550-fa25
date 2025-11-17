@@ -42,6 +42,9 @@ export default function Dashboard() {
   ) as Array<{ user: string; course: string }>;
 
   const userId = currentUser?._id ?? null;
+  const role = currentUser?.role ?? "";
+  const isFaculty = role === "FACULTY" || role === "ADMIN";
+  const isStudent = role === "STUDENT" || role === "USER";
 
   const [enrolling, setEnrolling] = useState(false);
 
@@ -65,11 +68,17 @@ export default function Dashboard() {
 
   const visibleCourses = useMemo(() => {
     if (!userId) return [];
-    return enrolling ? courses : courses.filter((c) => isEnrolled(c._id));
-  }, [enrolling, courses, enrollments, userId]);
+    if (isStudent) {
+      return enrolling ? courses : courses.filter((c) => isEnrolled(c._id));
+    }
+    if (isFaculty) {
+      return courses;
+    }
+    return courses;
+  }, [enrolling, courses, enrollments, userId, isStudent, isFaculty]);
 
   const toggleEnroll = (courseId: string) => {
-    if (!userId) return;
+    if (!userId || !isStudent) return;
     if (isEnrolled(courseId)) {
       dispatch(unenrollAction({ user: userId, course: courseId }));
     } else {
@@ -81,23 +90,22 @@ export default function Dashboard() {
     <div id="wd-dashboard" className="p-4">
       <div className="d-flex align-items-center justify-content-between">
         <h1 id="wd-dashboard-title" className="mb-0">Dashboard</h1>
-        <Button
-          id="wd-enrollments-toggle"
-          variant="primary"
-          onClick={() => setEnrolling((v) => !v)}
-          disabled={!currentUser}
-          aria-pressed={enrolling}
-          aria-label={
-            enrolling ? "Switch to My Courses view" : "Switch to All Courses view"
-          }
-        >
-          {enrolling ? "My Courses" : "All Courses"}
-        </Button>
+
+        {currentUser && isStudent && (
+          <Button
+            id="wd-enrollments-toggle"
+            variant="primary"
+            onClick={() => setEnrolling((v) => !v)}
+            aria-pressed={enrolling}
+          >
+            {enrolling ? "My Courses" : "All Courses"}
+          </Button>
+        )}
       </div>
 
       <hr />
 
-      {currentUser && (
+      {currentUser && isFaculty && (
         <>
           <h5 className="mb-2">
             New Course
@@ -121,8 +129,6 @@ export default function Dashboard() {
             className="mb-2"
             value={course.name}
             onChange={(e) => setCourse({ ...course, name: e.target.value })}
-            placeholder="Course name"
-            aria-label="Course name"
           />
           <FormControl
             className="mb-2"
@@ -132,8 +138,6 @@ export default function Dashboard() {
             }
             as="textarea"
             rows={3}
-            placeholder="Course description"
-            aria-label="Course description"
           />
           <hr />
         </>
@@ -148,10 +152,12 @@ export default function Dashboard() {
         </>
       ) : (
         <>
-          <h2 id="wd-dashboard-published" className="d-flex align-items-center">
-            {enrolling
-              ? `All Courses (${visibleCourses.length})`
-              : `My Courses (${visibleCourses.length})`}
+          <h2 id="wd-dashboard-published">
+            {isStudent
+              ? enrolling
+                ? `All Courses (${visibleCourses.length})`
+                : `My Courses (${visibleCourses.length})`
+              : `All Courses (${visibleCourses.length})`}
           </h2>
           <hr />
         </>
@@ -161,10 +167,12 @@ export default function Dashboard() {
         <Row xs={1} md={5} className="g-4">
           {visibleCourses.map((c) => {
             const enrolled = isEnrolled(c._id);
+
             return (
               <Col key={c._id} className="wd-dashboard-course" style={{ width: "300px" }}>
                 <Card className="position-relative">
-                  {enrolling && (
+                  
+                  {isStudent && enrolling && (
                     <Button
                       size="sm"
                       variant={enrolled ? "danger" : "success"}
@@ -179,7 +187,6 @@ export default function Dashboard() {
                         e.stopPropagation();
                         toggleEnroll(c._id);
                       }}
-                      aria-label={enrolled ? "Unenroll" : "Enroll"}
                     >
                       {enrolled ? "Unenroll" : "Enroll"}
                     </Button>
@@ -208,30 +215,34 @@ export default function Dashboard() {
                       </CardText>
 
                       <div className="d-flex justify-content-between align-items-center mt-2">
-                        <Button variant="primary" className="px-3">Go</Button>
+                        <Button variant="primary" className="px-3">
+                          Go
+                        </Button>
 
-                        <div className="d-flex gap-2">
-                          <Button
-                            id={`wd-edit-course-click-${c._id}`}
-                            className="btn btn-warning px-3"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              startEdit(c);
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            id={`wd-delete-course-click-${c._id}`}
-                            className="btn btn-danger px-3"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              dispatch(deleteCourse(c._id));
-                            }}
-                          >
-                            Delete
-                          </Button>
-                        </div>
+                        {isFaculty && (
+                          <div className="d-flex gap-2">
+                            <Button
+                              id={`wd-edit-course-click-${c._id}`}
+                              className="btn btn-warning px-3"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                startEdit(c);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              id={`wd-delete-course-click-${c._id}`}
+                              className="btn btn-danger px-3"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                dispatch(deleteCourse(c._id));
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </CardBody>
                   </Link>

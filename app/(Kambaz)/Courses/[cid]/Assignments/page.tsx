@@ -30,14 +30,24 @@ type AssignmentFull = BaseAssignment & {
 export default function Assignments() {
   const { cid } = useParams<{ cid: string }>();
   const dispatch = useDispatch();
-  const { assignments } = useSelector(
-    (state: { assignmentsReducer: { assignments: AssignmentFull[] } }) =>
-      state.assignmentsReducer
+  const router = useRouter();
+
+  const { assignments, currentUser } = useSelector(
+    (state: {
+      assignmentsReducer: { assignments: AssignmentFull[] };
+      accountReducer: { currentUser: { _id: string; role?: string } | null };
+    }) => ({
+      assignments: state.assignmentsReducer.assignments,
+      currentUser: state.accountReducer.currentUser,
+    })
   );
+
+  const role = currentUser?.role ?? "";
+  const isFaculty = role === "FACULTY";
+  const isStudent = role === "STUDENT" || role === "USER";
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
-  const router = useRouter();
 
   const [assignment, setAssignment] = useState<AssignmentFull>({
     _id: "",
@@ -54,6 +64,7 @@ export default function Assignments() {
   const [toDelete, setToDelete] = useState<AssignmentFull | null>(null);
 
   const addNewAssignment = () => {
+    if (!isFaculty) return;
     dispatch(addAssignment({ ...assignment, course: cid }));
     setAssignment({
       _id: "",
@@ -83,18 +94,25 @@ export default function Assignments() {
             />
           </InputGroup>
         </div>
-        <div className="ms-3 flex-shrink-0">
-          <Button variant="secondary" className="me-2 group-btn" id="wd-add-group">
-            + Group
-          </Button>
-          <Button
-            variant="danger"
-            id="wd-add-assignment"
-            onClick={() => router.push(`/Courses/${cid}/Assignments/new`)}
-          >
-            + Assignment
-          </Button>
-        </div>
+
+        {isFaculty && (
+          <div className="ms-3 flex-shrink-0">
+            <Button
+              variant="secondary"
+              className="me-2 group-btn"
+              id="wd-add-group"
+            >
+              + Group
+            </Button>
+            <Button
+              variant="danger"
+              id="wd-add-assignment"
+              onClick={() => router.push(`/Courses/${cid}/Assignments/new`)}
+            >
+              + Assignment
+            </Button>
+          </div>
+        )}
       </div>
 
       <AssignmentChange
@@ -120,6 +138,10 @@ export default function Assignments() {
           <Button
             variant="danger"
             onClick={() => {
+              if (!isFaculty) {
+                setShowDelete(false);
+                return;
+              }
               if (toDelete?._id) {
                 dispatch(deleteAssignment(toDelete._id));
               }
@@ -164,22 +186,28 @@ export default function Assignments() {
                           {a.title?.trim() || "(Untitled)"}
                         </Link>
 
-                        <div className="ms-2 d-flex align-items-center">
-                          <AssignmentControlButtons
-                            assignmentId={a._id}
-                            deleteAssignment={() => {
-                              setToDelete(a);
-                              setShowDelete(true);
-                            }}
-                            onEdit={(id) =>
-                              router.push(`/Courses/${cid}/Assignments/${id}`)
-                            }
-                          />
-                        </div>
+                        {isFaculty && (
+                          <div className="ms-2 d-flex align-items-center">
+                            <AssignmentControlButtons
+                              assignmentId={a._id}
+                              deleteAssignment={() => {
+                                setToDelete(a);
+                                setShowDelete(true);
+                              }}
+                              onEdit={(id) =>
+                                router.push(
+                                  `/Courses/${cid}/Assignments/${id}`
+                                )
+                              }
+                            />
+                          </div>
+                        )}
                       </div>
 
                       {a.description && (
-                        <div className="text-muted small mt-1">{a.description}</div>
+                        <div className="text-muted small mt-1">
+                          {a.description}
+                        </div>
                       )}
                       <div className="text-muted small mt-1">
                         {a.availableFrom && (

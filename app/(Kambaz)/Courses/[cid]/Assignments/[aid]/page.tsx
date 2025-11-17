@@ -39,10 +39,19 @@ export default function AssignmentEditor() {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const { assignments } = useSelector(
-    (state: { assignmentsReducer: { assignments: Assignment[] } }) =>
-      state.assignmentsReducer
+  const { assignments, currentUser } = useSelector(
+    (state: {
+      assignmentsReducer: { assignments: Assignment[] };
+      accountReducer: { currentUser: { _id: string; role?: string } | null };
+    }) => ({
+      assignments: state.assignmentsReducer.assignments,
+      currentUser: state.accountReducer.currentUser,
+    })
   );
+
+  const role = currentUser?.role ?? "";
+  const isFaculty = role === "FACULTY";
+  const isStudent = role === "STUDENT" || role === "USER";
 
   const isNew = aid === "new";
 
@@ -87,6 +96,7 @@ export default function AssignmentEditor() {
   };
 
   const handleSave = () => {
+    if (!isFaculty) return;
     if (isNew) {
       dispatch(addAssignment({ ...assignment, course: cid }));
     } else {
@@ -106,6 +116,7 @@ export default function AssignmentEditor() {
             onChange={(e) =>
               setAssignment({ ...assignment, title: e.target.value })
             }
+            readOnly={isStudent}
           />
         </FormGroup>
 
@@ -118,6 +129,7 @@ export default function AssignmentEditor() {
             onChange={(e) =>
               setAssignment({ ...assignment, description: e.target.value })
             }
+            readOnly={isStudent}
           />
         </FormGroup>
 
@@ -135,6 +147,7 @@ export default function AssignmentEditor() {
                   points: Number(e.target.value),
                 })
               }
+              readOnly={isStudent}
             />
           </Col>
         </FormGroup>
@@ -149,6 +162,7 @@ export default function AssignmentEditor() {
               onChange={(e) =>
                 setAssignment({ ...assignment, group: e.target.value })
               }
+              disabled={isStudent}
             >
               <option value="ASSIGNMENTS">ASSIGNMENTS</option>
               <option value="QUIZZES">QUIZZES</option>
@@ -172,6 +186,7 @@ export default function AssignmentEditor() {
                   displayGradeAs: e.target.value,
                 })
               }
+              disabled={isStudent}
             >
               <option value="Percentage">Percentage</option>
               <option value="Points">Points</option>
@@ -193,6 +208,7 @@ export default function AssignmentEditor() {
                     submissionType: e.target.value,
                   })
                 }
+                disabled={isStudent}
               >
                 <option value="Online">Online</option>
                 <option value="On Paper">On Paper</option>
@@ -218,6 +234,7 @@ export default function AssignmentEditor() {
                       assignment.onlineEntryOptions?.includes(opt) || false
                     }
                     onChange={() => handleCheckbox(opt)}
+                    disabled={isStudent}
                   />
                 ))}
               </div>
@@ -235,6 +252,7 @@ export default function AssignmentEditor() {
                 onChange={(e) =>
                   setAssignment({ ...assignment, assignTo: e.target.value })
                 }
+                readOnly={isStudent}
               />
             </FormGroup>
 
@@ -248,6 +266,7 @@ export default function AssignmentEditor() {
                     onChange={(e) =>
                       setAssignment({ ...assignment, due: e.target.value })
                     }
+                    readOnly={isStudent}
                   />
                 </FormGroup>
               </Col>
@@ -266,6 +285,7 @@ export default function AssignmentEditor() {
                         availableFrom: e.target.value,
                       })
                     }
+                    readOnly={isStudent}
                   />
                 </FormGroup>
               </Col>
@@ -281,6 +301,7 @@ export default function AssignmentEditor() {
                         availableUntil: e.target.value,
                       })
                     }
+                    readOnly={isStudent}
                   />
                 </FormGroup>
               </Col>
@@ -295,9 +316,11 @@ export default function AssignmentEditor() {
           >
             Cancel
           </Link>
-          <Button variant="danger" onClick={handleSave}>
-            Save
-          </Button>
+          {isFaculty && (
+            <Button variant="danger" onClick={handleSave}>
+              Save
+            </Button>
+          )}
         </div>
       </Form>
     </div>
