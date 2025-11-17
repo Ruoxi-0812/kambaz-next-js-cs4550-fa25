@@ -38,6 +38,7 @@ export default function Dashboard() {
 
   const role = currentUser?.role;
   const isFaculty = role === "FACULTY" || role === "ADMIN";
+  const isStudent = role === "STUDENT" || role === "USER";
 
   const userEnrollments = useSelector(
     (s: RootState) => s.enrollmentsReducer.userEnrollments
@@ -169,7 +170,7 @@ export default function Dashboard() {
   };
 
   const toggleEnroll = async (courseId: string) => {
-    if (!userId) return;
+    if (!userId || !isStudent) return;
     try {
       if (isEnrolled(courseId)) {
         await enrollmentsClient.unenroll(userId, courseId);
