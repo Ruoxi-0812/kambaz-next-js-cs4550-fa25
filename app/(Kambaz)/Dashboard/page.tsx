@@ -84,26 +84,56 @@ export default function Dashboard() {
       dispatch(clearEnrollments());
       return;
     }
+  
     try {
       const [allCourses, myEnrollments] = await Promise.all([
         coursesClient.fetchAllCourses(),
         enrollmentsClient.getUserEnrollments(currentUser._id),
       ]);
-
+  
       dispatch(setCourses(allCourses));
 
-      dispatch(
-        setUserEnrollments(
-          (myEnrollments ?? []).map((e: Enrollment) => ({
-            user: e.user,
-            course: e.course,
-          }))
-        )
-      );
+      let normalizedEnrollments = (myEnrollments ?? []).map((e: Enrollment) => ({
+        user: e.user,
+        course: e.course,
+      }));
+  
+      const role = currentUser.role;
+      const isFaculty = role === "FACULTY" || role === "ADMIN";
+  
+      if (isFaculty) {
+        const missingCourseIds = allCourses
+          .map((c: Course) => c._id)             
+          .filter(
+            (courseId: string) =>               
+              !normalizedEnrollments.some(
+                (e: Enrollment) => e.course === courseId
+              )
+          );
+      
+        if (missingCourseIds.length > 0) {
+          await Promise.all(
+            missingCourseIds.map((courseId: string) =>  
+              enrollmentsClient.enroll(currentUser._id, courseId)
+            )
+          );
+      
+          normalizedEnrollments = [
+            ...normalizedEnrollments,
+            ...missingCourseIds.map((courseId: string) => ({
+              user: currentUser._id,
+              course: courseId,
+            })),
+          ];
+        }
+      }
+  
+      dispatch(setUserEnrollments(normalizedEnrollments));
     } catch (e) {
       console.error("Failed to load dashboard data:", e);
     }
   };
+  
 
   useEffect(() => {
     fetchData();
