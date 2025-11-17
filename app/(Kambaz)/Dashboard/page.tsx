@@ -124,7 +124,7 @@ export default function Dashboard() {
 
   const onAddNewCourse = async () => {
     if (!currentUser || !isFaculty) return;
-
+  
     try {
       const newCourse = await coursesClient.createCourse({
         name: course.name,
@@ -132,20 +132,15 @@ export default function Dashboard() {
         description: course.description,
         image: course.image,
       });
-
-      dispatch(setCourses([...courses, newCourse]));
-
-      if (newCourse._id) {
-        await enrollmentsClient.enroll(currentUser._id, newCourse._id);
-        dispatch(
-          enrollCourse({ user: currentUser._id, course: newCourse._id })
-        );
-      }
+  
+      dispatch(setCourses([...courses, newCourse])); 
+  
       resetCourseForm();
     } catch (e) {
       console.error("Failed to add new course:", e);
     }
   };
+  
 
   const onUpdateCourse = async () => {
     if (!course._id || !currentUser || !isFaculty) return;
