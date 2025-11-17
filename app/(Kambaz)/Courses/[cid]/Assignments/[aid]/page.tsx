@@ -38,6 +38,7 @@ export default function AssignmentEditor() {
 
   const role = currentUser?.role;
   const isFaculty = role === "FACULTY" || role === "ADMIN";
+  const canEdit = !!isFaculty;
 
   const isNew = aid === "new";
 
@@ -99,6 +100,7 @@ export default function AssignmentEditor() {
   }, [isNew, aid, cid, router]);
 
   const handleCheckbox = (option: string) => {
+    if (!canEdit) return;
     const current = assignment.onlineEntryOptions || [];
     setAssignment({
       ...assignment,
@@ -109,7 +111,7 @@ export default function AssignmentEditor() {
   };
 
   const handleSave = async () => {
-    if (!isFaculty) return;
+    if (!canEdit) return;
     try {
       let saved: Assignment;
 
@@ -145,6 +147,7 @@ export default function AssignmentEditor() {
             onChange={(e) =>
               setAssignment({ ...assignment, title: e.target.value })
             }
+            readOnly={!canEdit}
           />
         </FormGroup>
 
@@ -157,6 +160,7 @@ export default function AssignmentEditor() {
             onChange={(e) =>
               setAssignment({ ...assignment, description: e.target.value })
             }
+            readOnly={!canEdit}
           />
         </FormGroup>
 
@@ -174,6 +178,7 @@ export default function AssignmentEditor() {
                   points: Number(e.target.value),
                 })
               }
+              readOnly={!canEdit}
             />
           </Col>
         </FormGroup>
@@ -188,6 +193,7 @@ export default function AssignmentEditor() {
               onChange={(e) =>
                 setAssignment({ ...assignment, group: e.target.value })
               }
+              disabled={!canEdit}
             >
               <option value="ASSIGNMENTS">ASSIGNMENTS</option>
               <option value="QUIZZES">QUIZZES</option>
@@ -211,6 +217,7 @@ export default function AssignmentEditor() {
                   displayGradeAs: e.target.value,
                 })
               }
+              disabled={!canEdit}
             >
               <option value="Percentage">Percentage</option>
               <option value="Points">Points</option>
@@ -232,6 +239,7 @@ export default function AssignmentEditor() {
                     submissionType: e.target.value,
                   })
                 }
+                disabled={!canEdit}
               >
                 <option value="Online">Online</option>
                 <option value="On Paper">On Paper</option>
@@ -257,6 +265,7 @@ export default function AssignmentEditor() {
                       assignment.onlineEntryOptions?.includes(opt) || false
                     }
                     onChange={() => handleCheckbox(opt)}
+                    disabled={!canEdit}
                   />
                 ))}
               </div>
@@ -274,6 +283,7 @@ export default function AssignmentEditor() {
                 onChange={(e) =>
                   setAssignment({ ...assignment, assignTo: e.target.value })
                 }
+                readOnly={!canEdit}
               />
             </FormGroup>
 
@@ -287,6 +297,7 @@ export default function AssignmentEditor() {
                     onChange={(e) =>
                       setAssignment({ ...assignment, due: e.target.value })
                     }
+                    readOnly={!canEdit}
                   />
                 </FormGroup>
               </Col>
@@ -305,6 +316,7 @@ export default function AssignmentEditor() {
                         availableFrom: e.target.value,
                       })
                     }
+                    readOnly={!canEdit}
                   />
                 </FormGroup>
               </Col>
@@ -320,6 +332,7 @@ export default function AssignmentEditor() {
                         availableUntil: e.target.value,
                       })
                     }
+                    readOnly={!canEdit}
                   />
                 </FormGroup>
               </Col>
@@ -334,9 +347,11 @@ export default function AssignmentEditor() {
           >
             Cancel
           </Link>
-          <Button variant="danger" onClick={handleSave} disabled={!isFaculty}>
-            Save
-          </Button>
+          {canEdit && (
+            <Button variant="danger" onClick={handleSave}>
+              Save
+            </Button>
+          )}
         </div>
       </Form>
     </div>

@@ -69,8 +69,14 @@ export default function Dashboard() {
 
   const visibleCourses = useMemo(() => {
     if (!userId) return [];
-    return enrolling ? courses : courses.filter((c) => isEnrolled(c._id));
-  }, [enrolling, courses, userEnrollments, userId]);
+    if (isStudent) {
+      return enrolling ? courses : courses.filter((c) => isEnrolled(c._id));
+    }
+    if (isFaculty) {
+      return courses;
+    }
+    return courses;
+  }, [enrolling, courses, userEnrollments, userId, isStudent, isFaculty]);
 
   const fetchData = async () => {
     if (!currentUser) {
@@ -192,15 +198,17 @@ export default function Dashboard() {
         <h1 id="wd-dashboard-title" className="mb-0">
           Dashboard
         </h1>
-        <Button
-          id="wd-enrollments-toggle"
-          variant="primary"
-          onClick={() => setEnrolling((v) => !v)}
-          disabled={!currentUser}
-          aria-pressed={enrolling}
-        >
-          {enrolling ? "My Courses" : "All Courses"}
-        </Button>
+
+        {currentUser && isStudent && (
+          <Button
+            id="wd-enrollments-toggle"
+            variant="primary"
+            onClick={() => setEnrolling((v) => !v)}
+            aria-pressed={enrolling}
+          >
+            {enrolling ? "My Courses" : "All Courses"}
+          </Button>
+        )}
       </div>
 
       <hr />
@@ -256,9 +264,11 @@ export default function Dashboard() {
       ) : (
         <>
           <h2 id="wd-dashboard-published" className="d-flex align-items-center">
-            {enrolling
-              ? `All Courses (${visibleCourses.length})`
-              : `My Courses (${visibleCourses.length})`}
+            {isStudent
+              ? enrolling
+                ? `All Courses (${visibleCourses.length})`
+                : `My Courses (${visibleCourses.length})`
+              : `All Courses (${visibleCourses.length})`}
           </h2>
           <hr />
         </>
@@ -322,32 +332,30 @@ export default function Dashboard() {
                           Go
                         </Button>
 
-                        <div className="d-flex gap-2">
-                          {isFaculty && (
-                            <>
-                              <Button
-                                id={`wd-edit-course-click-${c._id}`}
-                                className="btn btn-warning px-3"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  startEdit(c);
-                                }}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                id={`wd-delete-course-click-${c._id}`}
-                                className="btn btn-danger px-3"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  onDeleteCourse(c._id);
-                                }}
-                              >
-                                Delete
-                              </Button>
-                            </>
-                          )}
-                        </div>
+                        {isFaculty && (
+                          <div className="d-flex gap-2">
+                            <Button
+                              id={`wd-edit-course-click-${c._id}`}
+                              className="btn btn-warning px-3"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                startEdit(c);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              id={`wd-delete-course-click-${c._id}`}
+                              className="btn btn-danger px-3"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                onDeleteCourse(c._id);
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </CardBody>
                   </Link>
