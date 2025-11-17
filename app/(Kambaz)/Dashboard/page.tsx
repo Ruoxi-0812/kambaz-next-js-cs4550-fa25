@@ -90,49 +90,22 @@ export default function Dashboard() {
         coursesClient.fetchAllCourses(),
         enrollmentsClient.getUserEnrollments(currentUser._id),
       ]);
-  
+      
       dispatch(setCourses(allCourses));
-
-      let normalizedEnrollments = (myEnrollments ?? []).map((e: Enrollment) => ({
-        user: e.user,
-        course: e.course,
-      }));
   
-      const role = currentUser.role;
-      const isFaculty = role === "FACULTY" || role === "ADMIN";
-  
-      if (isFaculty) {
-        const missingCourseIds = allCourses
-          .map((c: Course) => c._id)             
-          .filter(
-            (courseId: string) =>               
-              !normalizedEnrollments.some(
-                (e: Enrollment) => e.course === courseId
-              )
-          );
-      
-        if (missingCourseIds.length > 0) {
-          await Promise.all(
-            missingCourseIds.map((courseId: string) =>  
-              enrollmentsClient.enroll(currentUser._id, courseId)
-            )
-          );
-      
-          normalizedEnrollments = [
-            ...normalizedEnrollments,
-            ...missingCourseIds.map((courseId: string) => ({
-              user: currentUser._id,
-              course: courseId,
-            })),
-          ];
-        }
-      }
+      const normalizedEnrollments = (myEnrollments ?? []).map(
+        (e: Enrollment) => ({
+          user: e.user,
+          course: e.course,
+        })
+      );
   
       dispatch(setUserEnrollments(normalizedEnrollments));
     } catch (e) {
       console.error("Failed to load dashboard data:", e);
     }
   };
+  
   
 
   useEffect(() => {
