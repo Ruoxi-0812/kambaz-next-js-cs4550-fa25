@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { setCurrentUser } from "../reducer";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
@@ -17,19 +17,35 @@ export default function Signin() {
     username: "ruoxi",
     password: "123456",
   });
+  const [error, setError] = useState("");
 
   const dispatch = useDispatch();
+  const router = useRouter();
 
-  const signin = async () => {
-    const user = await client.signin(credentials);
-    if (!user) return;
-    dispatch(setCurrentUser(user));
-    redirect("/Dashboard");
+  const handleSignin = async () => {
+    setError("");
+    try {
+      const user = await client.signin(credentials);
+      if (!user) {
+        setError("Invalid username or password.");
+        return;
+      }
+      dispatch(setCurrentUser(user));
+      router.push("/Dashboard");
+    } catch (_err) {
+      setError("Invalid username or password.");
+    }
   };
 
   return (
     <div id="wd-signin-screen">
       <h1>Sign in</h1>
+
+      {error && (
+        <div className="text-danger mb-2" id="wd-signin-error">
+          {error}
+        </div>
+      )}
 
       <FormControl
         value={credentials.username}
@@ -52,7 +68,11 @@ export default function Signin() {
         id="wd-password"
       />
 
-      <Button onClick={signin} id="wd-signin-btn" className="w-100 mb-2">
+      <Button
+        onClick={handleSignin}
+        id="wd-signin-btn"
+        className="w-100 mb-2"
+      >
         Sign in
       </Button>
 
