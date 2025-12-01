@@ -309,7 +309,7 @@ export default function Dashboard() {
                   >
                     <CardImg
                       variant="top"
-                      src={c.image || "/images/reactjs.jpg"}
+                      src={c.image || "/images/newcourse.jpg"}
                       width="100%"
                       height={160}
                       alt={c.name}

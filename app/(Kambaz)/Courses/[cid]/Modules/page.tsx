@@ -69,8 +69,8 @@ export default function Modules() {
   };
 
   const onUpdateModule = async (module: Module) => {
-    if (!isFaculty) return;
-    await client.updateModule(module);
+    if (!isFaculty || !cid) return;
+    await client.updateModule(cid, module);
     const updatedModules = modules.map((m: Module) =>
       m._id === module._id ? module : m
     );
@@ -78,9 +78,9 @@ export default function Modules() {
   };
 
   const onRemoveModule = async (moduleId: string) => {
-    if (!isFaculty) return;
-    await client.deleteModule(moduleId);
-    dispatch(deleteModule(moduleId));
+    if (!isFaculty || !cid) return;
+    await client.deleteModule(cid, moduleId);
+    dispatch(deleteModule(moduleId)); 
   };
 
   return (

@@ -21,6 +21,8 @@ export interface Course {
   image?: string;
 }
 
+// ------- Modules -------
+
 export const createModuleForCourse = async (
   courseId: string,
   module: Module
@@ -37,6 +39,25 @@ export const findModulesForCourse = async (courseId: string) => {
   return response.data;
 };
 
+// 删除模块：需要 courseId + moduleId
+export const deleteModule = async (courseId: string, moduleId: string) => {
+  const response = await axios.delete(
+    `${COURSES_API}/${courseId}/modules/${moduleId}`
+  );
+  return response.data;
+};
+
+// 更新模块：需要 courseId + module 对象
+export const updateModule = async (courseId: string, module: Module) => {
+  const { data } = await axios.put(
+    `${COURSES_API}/${courseId}/modules/${module._id}`,
+    module
+  );
+  return data;
+};
+
+// ------- Courses -------
+
 export const fetchAllCourses = async () => {
   const { data } = await axios.get(COURSES_API);
   return data;
@@ -50,10 +71,7 @@ export const findMyCourses = async () => {
 };
 
 export const createCourse = async (course: Course) => {
-  const { data } = await axiosWithCredentials.post(
-    `${USERS_API}/current/courses`,
-    course
-  );
+  const { data } = await axiosWithCredentials.post(COURSES_API, course);
   return data;
 };
 
@@ -67,14 +85,9 @@ export const updateCourse = async (course: Course) => {
   return data;
 };
 
-const MODULES_API = `${HTTP_SERVER}/api/modules`;
-
-export const deleteModule = async (moduleId: string) => {
-  const response = await axios.delete(`${MODULES_API}/${moduleId}`);
+export const findUsersForCourse = async (courseId: string) => {
+  const response = await axios.get(`${COURSES_API}/${courseId}/users`, {
+    withCredentials: true,
+  });
   return response.data;
-};
-
-export const updateModule = async (module: Module) => {
-  const { data } = await axios.put(`${MODULES_API}/${module._id}`, module);
-  return data;
 };
